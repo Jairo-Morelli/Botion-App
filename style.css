@@ -1,0 +1,49 @@
+html{
+    background-color:  #343835;
+    opacity: 0.9;
+}
+
+#info-0.Info.Component {
+    width: 100px;
+    height: 100px;
+    padding: 20px;
+    background-color: #669171;
+    
+}
+
+#info-0.Info.Component p {
+    opacity: 0.3;
+}
+
+/* 
+    P element is purposefully hidden, and should only show up 
+    when the button is hovered over.
+*/
+.Btn.Component p{
+    color: #7a857d;
+    font-size: 10px;
+    margin-left: 48.5%;
+    margin-bottom: 1.0px;
+    visibility: hidden;
+}
+
+.Btn.Component button {
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.0);
+    border: none;
+    margin-left: 50%;
+    width: auto;
+    height: auto;
+}
+
+.Btn.Component button img {
+    width: 40px;
+    height: auto;
+
+}
+
+.Btn.Component button:hover{
+    outline: none;
+    transform: scale(1.1);
+    background-color:  #3d423e;
+}

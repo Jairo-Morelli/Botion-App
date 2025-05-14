@@ -4,15 +4,18 @@ html{
 }
 
 #info-0.Info.Component {
-    width: 100px;
-    height: 100px;
-    padding: 20px;
+    width: 70px;
+    height: 70px;
+    padding: 10px;
     background-color: #669171;
-    
+    overflow-wrap: anywhere;
+
 }
 
 #info-0.Info.Component p {
     opacity: 0.3;
+    font-size: 12px;
+    text-align: center;
 }
 
 /* 
@@ -22,9 +25,19 @@ html{
 .Btn.Component p{
     color: #7a857d;
     font-size: 10px;
-    margin-left: 48.5%;
+    margin-left: 50%;
     margin-bottom: 1.0px;
-    visibility: hidden;
+   /* visibility: hidden; I did it like this first*/
+    opacity: 0.0;
+}
+
+/* 
+    The % unit is relative the parent element
+    so in order to center my divs using the % unit 
+    I have to know what is its parent element.
+*/
+.Btn.Component {
+    margin-top: 5%; 
 }
 
 .Btn.Component button {

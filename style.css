@@ -3,7 +3,7 @@ html{
     opacity: 0.9;
 }
 
-#info-0.Info.Component {
+#card-0.Card.Component {
     width: 70px;
     height: 70px;
     padding: 10px;
@@ -12,7 +12,7 @@ html{
 
 }
 
-#info-0.Info.Component p {
+#card-0.Card.Component p {
     opacity: 0.3;
     font-size: 12px;
     text-align: center;

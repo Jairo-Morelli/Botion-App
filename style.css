@@ -9,13 +9,60 @@ html{
     padding: 10px;
     background-color: #669171;
     overflow-wrap: anywhere;
-
+    border: 2.5px solid #0c0d0c;
 }
 
 #card-0.Card.Component p {
     opacity: 0.3;
     font-size: 12px;
     text-align: center;
+}
+
+#card-1.Card.Component {
+    width: 70px;
+    height: 70px;
+    padding: 10px;
+    background-color: #669171;
+    overflow-wrap: anywhere;
+    border: 2.5px solid #0c0d0c;
+}
+
+#card-1.Card.Component p {
+    opacity: 0.3;
+    font-size: 12px;
+    text-align: center;
+}
+#card-2.Card.Component {
+    width: 70px;
+    height: 70px;
+    padding: 10px;
+    background-color: #669171;
+    overflow-wrap: anywhere;
+    border: 2.5px solid #0c0d0c;
+}
+
+#card-2.Card.Component p {
+    opacity: 0.3;
+    font-size: 12px;
+    text-align: center;
+}
+#card-3.Card.Component {
+    width: 70px;
+    height: 70px;
+    padding: 10px;
+    background-color: #669171;
+    overflow-wrap: anywhere;
+    border: 2.5px solid #0c0d0c;
+}
+
+#card-3.Card.Component p {
+    opacity: 0.3;
+    font-size: 12px;
+    text-align: center;
+}
+
+.DashBoard.Component{
+    display: flex;
 }
 
 /* 

@@ -14,6 +14,8 @@ let BotionJSON = ""; //haven't written it yet
 /*keyboard input variable*/
 let keyboardChar = "";
 const listenerRegistry = new WeakMap();
+// Innerhtml templates 
+const innerHTMLTemplate = '<p>"Test Component" </p>';
 //card object\
 /*You can change the changes of the 
 card by having a very very simple update tick system 
@@ -27,6 +29,20 @@ const Card={
 
     }   
 }
+
+/* 
+    Testing out how to inject css into Botion
+*/
+const style= document.createElement('style');
+
+
+document.head.appendChild(style)
+// if(styleSheet && styleSheet.cssRules){
+//     for(let rule of styleSheet.cssRules)
+//     {
+//         console.log(rule.cssText);
+//     }
+// }
 //botion object 
 /* 
     I am going to be creating an 
@@ -108,7 +124,6 @@ botionObj.update = function (data_) {
 
 }
 /*functions */
-intialize();
 
 /*Event Listeners*/
 /*
@@ -194,6 +209,32 @@ addHabitButton.addEventListener("mouseover", () => {
     //addHoverInfo.style.visibility="visible";
     //I perfer working with numbers.
     addHoverInfo.style.opacity = 1.0;
+
+
+    
+})
+
+addHabitButton.addEventListener("mouseup", ()=>{
+    const newCard= Card;
+
+
+    newCard.htmlref=document.createElement("div");
+    newCard.htmlref.setAttribute("class","Card Component");
+    newCard.htmlref.setAttribute("id","card-5");
+    newCard.htmlref.innerHTML=innerHTMLTemplate;
+    cardsArray.push(Card);
+    
+
+    const parentNode = document.getElementById("dash");
+
+    console.log(newCard);
+
+    parentNode.append(newCard.htmlref);
+
+     style.textContent='#card-5.Card.Component{ width:70px; height:70p; padding:10px;background-color:#669171; overflow-wrap:anywhere; border: 2.5px solid #0c0d0c'+ 
+     '}'+
+     '#card-5.Card.Component p {opacity:0.3; font-size:12px; text-align:center;}'
+     document.head.appendChild(style);
 })
 
 addHabitButton.addEventListener("mouseleave", () => {

@@ -4,36 +4,183 @@
  * License: Do not copy or redistribute without permission.
  */
 
+/*Class delecrations*/
+/*Mediator design pattern used for 
+
+Define an objec that encapsualtes how a set of objects interact. Mediator promotes
+loose coupling by keeeping objects from referring to each other explicitly, and it lets you 
+vary their interaction indepedently. 
+*/
+class BotionMediator{
+    constructor()
+    {
+        this.components={};
+    }
+
+    register(name,component)
+    {
+        this.components[name]= component;
+        component.setMediator(this);
+    }
+
+    send(message, from,to)
+    {
+        if(this.components[to])
+        {
+            this.components[to].receive(message,from);
+        }
+    }
+}
+
+class Component{
+    constructor(name)
+    {
+        this.name=name;
+        this.mediator=null;
+    }
+
+    setMediator(mediator)
+    {
+        this.mediator = mediator;
+    }
+
+    send(message, to)
+    {
+        this.mediator.send(message, this.name, to);
+    }
+
+    receive(message, from)
+    {
+        console.log(`${this.name} recieved: "${message}" from ${from}`);
+    }
+}
+
+
+/*The Card class definition */
+class Card {
+    constructor() {
+        this.isClicked = false;
+        this.hasChanged = false;
+        this.htmlref= HTMLElement;
+    }
+    update() {
+
+    }
+    isClicked=false;
+    hasChanged=false;
+    htmlref= null;
+   
+}
+
+/*Card Manager Class */
+class CardManager{
+    constructor()
+    {
+        this.#component= new Component("CardManager");
+    }
+
+    updateCards()
+    {
+
+    }
+    #component=null;
+}
+
+/*Style Manager Class */
+class styleManager
+{
+    constructor()
+    {
+        this.#component= new Component("BotionApp");
+    }
+
+    #component=null;
+}
+
+/*The Class that will be the "working" memory of Botion 
+web application */
+class Botion {
+    constructor() {
+        if(Botion.instance)
+        {
+            this.#component= new Component("BotionApp")
+            return Botion.instance; 
+        }
+        Botion.instance=this; 
+    }
+    update_UI() {
+
+    }
+
+    static getInstance(){
+        if(!Botion.instance)
+        {
+            Botion.instance= new Botion();
+        }
+        return Botion.instance;
+    }
+    /*setter*/
+    set botion_JSON(data_)
+    {
+        this.#botionJSON.concat(data_);
+    }
+
+    set Dashboard_JSON(data_)
+    {
+        this.#DashboardJSON.concat(data_);
+    }
+    /*getters*/
+    get botion_JSON()
+    {
+        return this.Botion_JSON;
+    }
+
+    get dashBoard_JSON()
+    {
+        return this.DashboardJSON;
+    }
+
+    static instance;
+    //Private variables
+    #botionJSON=""; 
+    #DashboardJSON="";
+    #component=null;
+    
+
+}
+
 
 /*pre-defined objects */
 let cardJSONArray = '{ "cardData":[' +
     '{ "title":" " , "text":" " }]}';
-let DashboardJSON =""; //haven't written it yet
+let DashboardJSON = ""; //haven't written it yet
 /*This is my JSON object that stores all my web application data*/
 let BotionJSON = ""; //haven't written it yet
 /*keyboard input variable*/
 let keyboardChar = "";
-const listenerRegistry = new WeakMap();
 // Innerhtml templates 
 const innerHTMLTemplate = '<p>"Test Component" </p>';
+/*Somewhere to hold all the event listeners. */
+const listenerRegistry = new WeakMap();
 //card object\
 /*You can change the changes of the 
 card by having a very very simple update tick system 
 that checks to see if anything has change.*/
-const Card={
-    htmlref:HTMLElement,
-    isClicked:false,
-    hasChanged: false,
-    update() // if anything happens to the card update the contents of the card
-    {
+//const Card_deprecated = {
+ //   htmlref: HTMLElement,
+//    isClicked: false,
+//    hasChanged: false,
+//    update() // if anything happens to the card update the contents of the card
+//    {
 
-    }   
-}
+//    }
+//}
+
 
 /* 
     Testing out how to inject css into Botion
 */
-const style= document.createElement('style');
+const style = document.createElement('style');
 
 
 document.head.appendChild(style)
@@ -52,28 +199,24 @@ document.head.appendChild(style)
 
     If there are some over lap with some global variables I plan to remove the global variables.
 */
-const botionObj={
-    BotionJSON:"",
-    DashboardJSON:"",
+const botionObj = {
+    BotionJSON: "",
+    DashboardJSON: "",
 }
 
-let cardsArray=[Card];
+let cardsArray = [];
 /*pre-defined objects*/
-
-let card0= cardsArray[0];
 
 
 /*Casually re-writing browser Javascript functionality */
 const originalAdd = EventTarget.prototype.addEventListener;
 //With this piece of code I just re-wrote Browser Javascript functionality
-EventTarget.prototype.addEventListener = function (type,listener, options)
-{
-    if(!listenerRegistry.has(this))
-    {
-        listenerRegistry.set(this,[]);
+EventTarget.prototype.addEventListener = function (type, listener, options) {
+    if (!listenerRegistry.has(this)) {
+        listenerRegistry.set(this, []);
     }
-    listenerRegistry.get(this).push({type,listener,options});
-    originalAdd.call(this,type,listener,options);
+    listenerRegistry.get(this).push({ type, listener, options });
+    originalAdd.call(this, type, listener, options);
 };
 
 /*
@@ -84,7 +227,6 @@ the DOM has been fully loaded or after.
 I've gone with the design choice of injecting my javascript code after the DOM file has mostly loaded.
 */
 const addHabitButton = document.getElementById("btn-add");
-card0.htmlref = document.getElementById("card-0");
 
 
 
@@ -93,8 +235,7 @@ function intialize() {
     BotionJSON = JSON.parse(cardJSONArray);
 }
 
-function getListeners(el)
-{
+function getListeners(el) {
     return listenerRegistry.get(el) || [];
 }
 
@@ -105,13 +246,11 @@ function getListeners(el)
     if it is a card, then update the card function, and update the 
     associated json information.
 */
-function UI_Update(UI_element)
-{
-    if(UI_element.isClicked)
-    {
-        switch (UI_element){
+function UI_Update(UI_element) {
+    if (UI_element.isClicked) {
+        switch (UI_element) {
 
-            case Card:
+            case Card_deprecated:
                 {
                     console.log("tried to update a UI_card element");
                     break;
@@ -164,32 +303,32 @@ document.addEventListener("keyup", (e) => {
                     keyboardChar += ' '
                     break;
                 }
-                //Ignore this input
+            //Ignore this input
             case "Control":
                 {
                     break;
                 }
             default:
-            {
-                keyboardChar+=character;
-                break;
-            }
+                {
+                    keyboardChar += character;
+                    break;
+                }
         }
-        if(card0.isClicked==true)
-            {
-                card0.htmlref.textContent+=keyboardChar;
-            }
+        // if (card0.isClicked == true) {
+        //     card0.htmlref.textContent += keyboardChar;
+        // }
     }
-    UI_Update(card0);
 })
 
 
-card0.htmlref.addEventListener("mouseup", ()=>{
+// card0.htmlref.addEventListener("mouseup", () => {
 
-    console.log("This card has been selected");
-    card0.isClicked=true;
-    UI_Update(card0);
-})
+//     console.log("This card has been selected");
+
+//     //This needs to be more modular.
+//     card0.isClicked = true;
+//     UI_Update(card0);
+// })
 
 //works
 addHabitButton.addEventListener("mouseover", () => {
@@ -211,19 +350,20 @@ addHabitButton.addEventListener("mouseover", () => {
     addHoverInfo.style.opacity = 1.0;
 
 
-    
+
 })
 
-addHabitButton.addEventListener("mouseup", ()=>{
-    const newCard= Card;
+addHabitButton.addEventListener("mouseup", () => {
+    const newCard = new Card();
 
 
-    newCard.htmlref=document.createElement("div");
-    newCard.htmlref.setAttribute("class","Card Component");
-    newCard.htmlref.setAttribute("id","card-5");
-    newCard.htmlref.innerHTML=innerHTMLTemplate;
-    cardsArray.push(Card);
-    
+    /*Needs to be more modular*/
+    newCard.htmlref = document.createElement("div");
+    newCard.htmlref.setAttribute("class", "Card Component");
+    newCard.htmlref.setAttribute("id", "card-5");
+    newCard.htmlref.innerHTML = innerHTMLTemplate;
+    cardsArray.push(Card_deprecated);
+
 
     const parentNode = document.getElementById("dash");
 
@@ -231,10 +371,12 @@ addHabitButton.addEventListener("mouseup", ()=>{
 
     parentNode.append(newCard.htmlref);
 
-     style.textContent='#card-5.Card.Component{ width:70px; height:70p; padding:10px;background-color:#669171; overflow-wrap:anywhere; border: 2.5px solid #0c0d0c'+ 
-     '}'+
-     '#card-5.Card.Component p {opacity:0.3; font-size:12px; text-align:center;}'
-     document.head.appendChild(style);
+
+    // This needs to be more modular.
+    style.textContent = '#card-5.Card.Component{ width:70px; height:70p; padding:10px;background-color:#669171; overflow-wrap:anywhere; border: 2.5px solid #0c0d0c' +
+        '}' +
+        '#card-5.Card.Component p {opacity:0.3; font-size:12px; text-align:center;}'
+    document.head.appendChild(style);
 })
 
 addHabitButton.addEventListener("mouseleave", () => {

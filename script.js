@@ -46,9 +46,9 @@ class Component {
         console.log(`${this.name} recieved: "${message}" from ${from}`);
         //Create a anymous function, that will get called 
         // but you can define it, in your concrete class
-        this.updateComponent();
+        this.updateComponent(message);
     }
-    updateComponent = function () { };
+    updateComponent = function (message) { };
 }
 
 
@@ -91,7 +91,7 @@ class CardManager {
 
     }
     /*Concrete component functionality */
-    update_Component() {
+    update_Component(message) {
 
     }
 
@@ -107,14 +107,15 @@ class CardManager {
     createCard(card_) {
         card_ = document.createElement("div");
         card_.setAttribute("class", "Card Component");
-        card_.setAttribute("id", "card-"+(cardsArray.length + 1)); //ID's will always start at 1.
-        cardsArray.push(card_);
+        card_.setAttribute("id", "card-" + (cardsArray.length + 1)); //ID's will always start at 1.
+        this.#cardsArray.push(card_);
+        this.#component.send(card_, "StyleManager");
         return card_;
     }
     static instance;
-    #component = null;
+    #component;
     #cardsArray = [];
-
+    x
 
 }
 
@@ -126,7 +127,8 @@ class StyleManager {
         }
         StyleManager.instance = this;
         this.#component = new Component("Style");
-        this.#component.updateComponent = this.update_Component();
+        this.#component.updateComponent = this.update_Component;
+        this.#style = document.createElement("style");
     }
 
     static getInstance() {
@@ -137,14 +139,37 @@ class StyleManager {
     }
 
     /*Concrete component functionality */
-    update_Component() {
+    update_Component(message) {
+        /* 
+         Here take the current card and then update its style attributes and then append 
+         to the document object model.
+        */
 
+
+        // // This needs to be more modular.
+        // style.textContent = '#card-5.Card.Component{ width:70px; height:70p; padding:10px;background-color:#669171; overflow-wrap:anywhere; border: 2.5px solid #0c0d0c' +
+        //     '}' +
+        //     '#card-5.Card.Component p {opacity:0.3; font-size:12px; text-align:center;}'
+        //    document.head.appendChild(style);
+
+        const s = StyleManager.getInstance().get_Style;
+
+
+        s.textContent = `#${message.getAttribute("id")}.Card.Component{width:70px; height:70p; padding:10px;background-color:#669171; overflow-wrap:anywhere; border: 2.5px solid #0c0d0c`+       
+        '}'+
+        `#${message.getAttribute("id")}.Card.Component p {opacity:0.3' font-size:12px; text-align:center;}`;
+        console.log(message.getAttribute("id"));
+        document.head.append(s);
     }
     get get_Component() {
         return this.#component;
     }
+    get get_Style() {
+        return this.#style;
+    }
     static instance;
-    #component = null;
+    #component;
+    #style;
 }
 
 /*The Class that will be the "working" memory of Botion 
@@ -163,7 +188,7 @@ class BotionMemory {
     }
 
     /*Concrete component functionality */
-    update_Component() {
+    update_Component(message) {
 
     }
 
@@ -247,8 +272,7 @@ that checks to see if anything has change.*/
 /* 
     Testing out how to inject css into Botion
 */
-const style = document.createElement('style');
-document.head.appendChild(style)
+
 // if(styleSheet && styleSheet.cssRules){
 //     for(let rule of styleSheet.cssRules)
 //     {
@@ -310,8 +334,9 @@ function intialize() {
 
     meditor.register("BotionMemory", botionMem.get_Component);
     meditor.register("CardManager", cardMang.get_Component);
-    meditor.register("styleManager", styleMang.get_Component);
+    meditor.register("StyleManager", styleMang.get_Component);
 
+    document.head.appendChild(styleMang.get_Style);
 
     /*
     This is dash board memory
@@ -465,6 +490,7 @@ addHabitButton.addEventListener("mouseover", () => {
 addHabitButton.addEventListener("mouseup", () => {
     let newCard = new Card();
     newCard.htmlref = cardMang.createCard(newCard.htmlref);
+
 
     DashBoardNode.append(newCard.htmlref);
 

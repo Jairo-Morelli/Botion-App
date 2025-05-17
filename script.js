@@ -11,52 +11,44 @@ Define an objec that encapsualtes how a set of objects interact. Mediator promot
 loose coupling by keeeping objects from referring to each other explicitly, and it lets you 
 vary their interaction indepedently. 
 */
-class BotionMediator{
-    constructor()
-    {
-        this.components={};
+class BotionMediator {
+    constructor() {
+        this.components = {};
     }
 
-    register(name,component)
-    {
-        this.components[name]= component;
+    register(name, component) {
+        this.components[name] = component;
         component.setMediator(this);
     }
 
-    send(message, from,to)
-    {
-        if(this.components[to])
-        {
-            this.components[to].receive(message,from);
+    send(message, from, to) {
+        if (this.components[to]) {
+            this.components[to].receive(message, from);
         }
     }
 }
 
-class Component{
-    constructor(name)
-    {
-        this.name=name;
-        this.mediator=null;
+class Component {
+    constructor(name) {
+        this.name = name;
+        this.mediator = null;
     }
 
-    setMediator(mediator)
-    {
+    setMediator(mediator) {
         this.mediator = mediator;
     }
 
-    send(message, to)
-    {
+    send(message, to) {
         this.mediator.send(message, this.name, to);
     }
 
-    receive(message, from)
-    {
+    receive(message, from) {
         console.log(`${this.name} recieved: "${message}" from ${from}`);
         //Create a anymous function, that will get called 
         // but you can define it, in your concrete class
         this.updateComponent();
     }
-    updateComponent= function (){};
+    updateComponent = function () { };
 }
 
 
@@ -65,160 +57,146 @@ class Card {
     constructor() {
         this.isClicked = false;
         this.hasChanged = false;
-        this.htmlref= HTMLElement;
+        this.htmlref = HTMLElement;
     }
     update() {
 
     }
-    isClicked=false;
-    hasChanged=false;
-    htmlref= null;
-   
+    isClicked = false;
+    hasChanged = false;
+    htmlref = null;
+
 }
 
 /*Card Manager Class */
-class CardManager{
-    constructor()
-    {
-        if(CardManager.instance)
-        {
+class CardManager {
+    constructor() {
+        if (CardManager.instance) {
             console.error("Already existing instance of CardManager Object");
         }
-        CardManager.instance=this;
-        this.#component= new Component("CardManager");
-        this.#component.updateComponent=this.update_Component;
-        this.#cardsArray=[];
+        CardManager.instance = this;
+        this.#component = new Component("CardManager");
+        this.#component.updateComponent = this.update_Component;
+        this.#cardsArray = [];
     }
 
-    static getInstance()
-    {
-        if(!CardManager.instance)
-        {
-            CardManager.instance= new CardManager();
+    static getInstance() {
+        if (!CardManager.instance) {
+            CardManager.instance = new CardManager();
         }
         return CardManager.instance;
     }
 
-    updateCards()
-    {
+    updateCards() {
 
     }
     /*Concrete component functionality */
-    update_Component()
-    {
-       
+    update_Component() {
+
     }
 
     /*getters*/
-    get get_Component()
-    {
+    get get_Component() {
         return this.#component;
     }
 
-    get get_cardsArray()
-    {
+    get get_cardsArray() {
         return this.#cardsArray;
     }
+
+    createCard(card_) {
+        card_ = document.createElement("div");
+        card_.setAttribute("class", "Card Component");
+        card_.setAttribute("id", "card-"+(cardsArray.length + 1)); //ID's will always start at 1.
+        cardsArray.push(card_);
+        return card_;
+    }
     static instance;
-    #component=null;
-    #cardsArray=[];
+    #component = null;
+    #cardsArray = [];
 
 
 }
 
 /*Style Manager Class */
-class StyleManager
-{
-    constructor()
-    {
-        if(StyleManager.instance)
-        {
+class StyleManager {
+    constructor() {
+        if (StyleManager.instance) {
             console.error("Already existing instance of StyleManager Object");
         }
-        StyleManager.instance=this;
-        this.#component= new Component("Style");
-        this.#component.updateComponent=this.update_Component();
+        StyleManager.instance = this;
+        this.#component = new Component("Style");
+        this.#component.updateComponent = this.update_Component();
     }
 
-    static getInstance(){
-        if(!StyleManager.instance)
-        {
-            StyleManager.instance= new StyleManager();
+    static getInstance() {
+        if (!StyleManager.instance) {
+            StyleManager.instance = new StyleManager();
         }
         return StyleManager.instance;
     }
-    
+
     /*Concrete component functionality */
-    update_Component()
-    {
+    update_Component() {
 
     }
-    get get_Component()
-    {
+    get get_Component() {
         return this.#component;
     }
     static instance;
-    #component=null;
+    #component = null;
 }
 
 /*The Class that will be the "working" memory of Botion 
 web application */
 class BotionMemory {
     constructor() {
-        if(BotionMemory.instance)
-        {
+        if (BotionMemory.instance) {
             console.error("Already existing instance of BotionMemory Object");
         }
-        BotionMemory.instance=this; 
-        this.#component= new Component("BotionApp")
-        this.#component.updateComponent=this.update_Component;
+        BotionMemory.instance = this;
+        this.#component = new Component("BotionApp")
+        this.#component.updateComponent = this.update_Component;
     }
     update_UI() {
 
     }
 
     /*Concrete component functionality */
-    update_Component()
-    {
+    update_Component() {
 
     }
 
-    static getInstance(){
-        if(!BotionMemory.instance)
-        {
-            BotionMemory.instance= new BotionMemory();
+    static getInstance() {
+        if (!BotionMemory.instance) {
+            BotionMemory.instance = new BotionMemory();
         }
         return BotionMemory.instance;
     }
     /*setter*/
-    set botion_JSON(data_)
-    {
+    set botion_JSON(data_) {
         this.#botionJSON.concat(data_);
     }
 
-    set Dashboard_JSON(data_)
-    {
+    set Dashboard_JSON(data_) {
         this.#dashboardJSON.concat(data_);
     }
     /*getters*/
-    get get_Botion_JSON()
-    {
+    get get_Botion_JSON() {
         return this.#botionJSON;
     }
 
-    get get_DashBoard_JSON()
-    {
+    get get_DashBoard_JSON() {
         return this.#dashboardJSON;
     }
 
-    get get_Component()
-    {
+    get get_Component() {
         return this.#component;
     }
 
     static instance;
     //Private variables
-    #botionJSON; 
+    #botionJSON;
     #dashboardJSON;
     #component;
 }
@@ -229,10 +207,10 @@ class BotionMemory {
 //Instantiate CardMang
 //Instantiate styleMang
 //Instantiate DashBoard
-const botionMem= new BotionMemory();
-const meditor= new BotionMediator();
-const cardMang= new CardManager();
-const styleMang= new StyleManager();
+const botionMem = new BotionMemory();
+const meditor = new BotionMediator();
+const cardMang = new CardManager();
+const styleMang = new StyleManager();
 const DashBoardNode = document.getElementById("dash");
 
 
@@ -253,7 +231,7 @@ const listenerRegistry = new WeakMap();
 card by having a very very simple update tick system 
 that checks to see if anything has change.*/
 //const Card_deprecated = {
- //   htmlref: HTMLElement,
+//   htmlref: HTMLElement,
 //    isClicked: false,
 //    hasChanged: false,
 //    update() // if anything happens to the card update the contents of the card
@@ -330,30 +308,30 @@ const addHabitButton = document.getElementById("btn-add");
 /*functions*/
 function intialize() {
 
-meditor.register("BotionMemory",botionMem.get_Component);
-meditor.register("CardManager", cardMang.get_Component);
-meditor.register("styleManager",styleMang.get_Component);
+    meditor.register("BotionMemory", botionMem.get_Component);
+    meditor.register("CardManager", cardMang.get_Component);
+    meditor.register("styleManager", styleMang.get_Component);
 
 
-/*
-This is dash board memory
+    /*
+    This is dash board memory
+    
+    I can create a function that writes dash board memory, 
+    
+    I can create a function that reads dash board memory.
+    
+    I can have working memory interaction with my JSON data notionation 
+    and have my own specific read and write functions do whatever they want with it.
+    */
+    // botionMem='<div class="Card Component" id="card-0">'+
+    //            '<p> Test Component<p>'+
+    //             '</div>'+
+    //             ''+
+    //             '<div class="Card Component" id="card-1">'+
+    //             '<p> Test Component </p>'+
+    //             '</div>';
 
-I can create a function that writes dash board memory, 
-
-I can create a function that reads dash board memory.
-
-I can have working memory interaction with my JSON data notionation 
-and have my own specific read and write functions do whatever they want with it.
-*/
-botionMem='<div class="Card Component" id="card-0">'+
-           '<p> Test Component<p>'+
-            '</div>'+
-            ''+
-            '<div class="Card Component" id="card-1">'+
-            '<p> Test Component </p>'+
-            '</div>';
-
-DashBoardNode.append(botionM)
+    // DashBoardNode.append(botionM)
 }
 
 intialize();
@@ -373,9 +351,11 @@ function getListeners(el) {
 */
 function UI_Update(UI_element) {
     if (UI_element.isClicked) {
+        /*Update according to the 
+        type of element you're dealing with? */
         switch (UI_element) {
 
-            case Card_deprecated:
+            case Card:
                 {
                     console.log("tried to update a UI_card element");
                     break;
@@ -442,6 +422,13 @@ document.addEventListener("keyup", (e) => {
     }
 })
 
+/*
+* I think that because you're planning to have n amount of cards 
+
+what you need to do when it comes to adding the event listeners, is that 
+you need to give a a signature, that doesn't do anything. The set/define the signuature 
+when you actually create the card.
+*/
 
 // card0.htmlref.addEventListener("mouseup", () => {
 
@@ -476,29 +463,17 @@ addHabitButton.addEventListener("mouseover", () => {
 })
 
 addHabitButton.addEventListener("mouseup", () => {
-    const newCard = new Card();
+    let newCard = new Card();
+    newCard.htmlref = cardMang.createCard(newCard.htmlref);
+
+    DashBoardNode.append(newCard.htmlref);
 
 
-
-    /*Create new card*/
-    newCard.htmlref = document.createElement("div");
-    newCard.htmlref.setAttribute("class", "Card Component");
-    //This right here needs to be more modular
-    newCard.htmlref.setAttribute("id", "card-5");
-    newCard.htmlref.innerHTML = innerHTMLTemplate;
-    cardMang.get_cardsArray.push(newCard);
-
-
-
-
-
-
-
-    // This needs to be more modular.
-    style.textContent = '#card-5.Card.Component{ width:70px; height:70p; padding:10px;background-color:#669171; overflow-wrap:anywhere; border: 2.5px solid #0c0d0c' +
-        '}' +
-        '#card-5.Card.Component p {opacity:0.3; font-size:12px; text-align:center;}'
-    document.head.appendChild(style);
+    // // This needs to be more modular.
+    // style.textContent = '#card-5.Card.Component{ width:70px; height:70p; padding:10px;background-color:#669171; overflow-wrap:anywhere; border: 2.5px solid #0c0d0c' +
+    //     '}' +
+    //     '#card-5.Card.Component p {opacity:0.3; font-size:12px; text-align:center;}'
+    //    document.head.appendChild(style);
 })
 
 addHabitButton.addEventListener("mouseleave", () => {

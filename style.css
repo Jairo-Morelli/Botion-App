@@ -61,6 +61,53 @@ html{
     text-align: center;
 }
 
+#card-4.Card.Component {
+    width: 70px;
+    height: 70px;
+    padding: 10px;
+    background-color: #669171;
+    overflow-wrap: anywhere;
+    border: 2.5px solid #0c0d0c;
+}
+
+#card-4.Card.Component p {
+    opacity: 0.3;
+    font-size: 12px;
+    text-align: center;
+}
+
+#card-5.Card.Component {
+    width: 70px;
+    height: 70px;
+    padding: 10px;
+    background-color: #669171;
+    overflow-wrap: anywhere;
+    border: 2.5px solid #0c0d0c;
+}
+
+#card-5.Card.Component p {
+    opacity: 0.3;
+    font-size: 12px;
+    text-align: center;
+}
+
+#card-6.Card.Component {
+    width: 70px;
+    height: 70px;
+    padding: 10px;
+    background-color: #669171;
+    overflow-wrap: anywhere;
+    border: 2.5px solid #0c0d0c;
+}
+
+#card-6.Card.Component p {
+    opacity: 0.3;
+    font-size: 12px;
+    text-align: center;
+}
+
+
+
 .DashBoard.Component{
     display: flex;
 }

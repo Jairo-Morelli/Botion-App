@@ -52,7 +52,11 @@ class Component{
     receive(message, from)
     {
         console.log(`${this.name} recieved: "${message}" from ${from}`);
+        //Create a anymous function, that will get called 
+        // but you can define it, in your concrete class
+        this.updateComponent();
     }
+    updateComponent= function (){};
 }
 
 
@@ -76,48 +80,115 @@ class Card {
 class CardManager{
     constructor()
     {
+        if(CardManager.instance)
+        {
+            console.error("Already existing instance of CardManager Object");
+        }
+        CardManager.instance=this;
         this.#component= new Component("CardManager");
+        this.#component.updateComponent=this.update_Component;
+        this.#cardsArray=[];
+    }
+
+    static getInstance()
+    {
+        if(!CardManager.instance)
+        {
+            CardManager.instance= new CardManager();
+        }
+        return CardManager.instance;
     }
 
     updateCards()
     {
 
     }
+    /*Concrete component functionality */
+    update_Component()
+    {
+       
+    }
+
+    /*getters*/
+    get get_Component()
+    {
+        return this.#component;
+    }
+
+    get get_cardsArray()
+    {
+        return this.#cardsArray;
+    }
+    static instance;
     #component=null;
+    #cardsArray=[];
+
+
 }
 
 /*Style Manager Class */
-class styleManager
+class StyleManager
 {
     constructor()
     {
-        this.#component= new Component("BotionApp");
+        if(StyleManager.instance)
+        {
+            console.error("Already existing instance of StyleManager Object");
+        }
+        StyleManager.instance=this;
+        this.#component= new Component("Style");
+        this.#component.updateComponent=this.update_Component();
     }
 
+    static getInstance(){
+        if(!StyleManager.instance)
+        {
+            StyleManager.instance= new StyleManager();
+        }
+        return StyleManager.instance;
+    }
+    
+    /*Concrete component functionality */
+    update_Component()
+    {
+
+    }
+    get get_Component()
+    {
+        return this.#component;
+    }
+    static instance;
     #component=null;
 }
 
 /*The Class that will be the "working" memory of Botion 
 web application */
-class Botion {
+class BotionMemory {
     constructor() {
-        if(Botion.instance)
+        if(BotionMemory.instance)
         {
-            this.#component= new Component("BotionApp")
-            return Botion.instance; 
+            console.error("Already existing instance of BotionMemory Object");
         }
-        Botion.instance=this; 
+        BotionMemory.instance=this; 
+        this.#component= new Component("BotionApp")
+        this.#component.updateComponent=this.update_Component;
     }
     update_UI() {
 
     }
 
+    /*Concrete component functionality */
+    update_Component()
+    {
+
+    }
+
     static getInstance(){
-        if(!Botion.instance)
+        if(!BotionMemory.instance)
         {
-            Botion.instance= new Botion();
+            BotionMemory.instance= new BotionMemory();
         }
-        return Botion.instance;
+        return BotionMemory.instance;
     }
     /*setter*/
     set botion_JSON(data_)
@@ -127,27 +198,42 @@ class Botion {
 
     set Dashboard_JSON(data_)
     {
-        this.#DashboardJSON.concat(data_);
+        this.#dashboardJSON.concat(data_);
     }
     /*getters*/
-    get botion_JSON()
+    get get_Botion_JSON()
     {
-        return this.Botion_JSON;
+        return this.#botionJSON;
     }
 
-    get dashBoard_JSON()
+    get get_DashBoard_JSON()
     {
-        return this.DashboardJSON;
+        return this.#dashboardJSON;
+    }
+
+    get get_Component()
+    {
+        return this.#component;
     }
 
     static instance;
     //Private variables
-    #botionJSON=""; 
-    #DashboardJSON="";
-    #component=null;
-    
-
+    #botionJSON; 
+    #dashboardJSON;
+    #component;
 }
+
+
+//Instantiate Botion Mem
+//Instantiate BotionMediator 
+//Instantiate CardMang
+//Instantiate styleMang
+//Instantiate DashBoard
+const botionMem= new BotionMemory();
+const meditor= new BotionMediator();
+const cardMang= new CardManager();
+const styleMang= new StyleManager();
+const DashBoardNode = document.getElementById("dash");
 
 
 /*pre-defined objects */
@@ -177,12 +263,13 @@ that checks to see if anything has change.*/
 //}
 
 
+
+
+
 /* 
     Testing out how to inject css into Botion
 */
 const style = document.createElement('style');
-
-
 document.head.appendChild(style)
 // if(styleSheet && styleSheet.cssRules){
 //     for(let rule of styleSheet.cssRules)
@@ -229,11 +316,49 @@ I've gone with the design choice of injecting my javascript code after the DOM f
 const addHabitButton = document.getElementById("btn-add");
 
 
+/*
+    You can have like a group of functions that work in this order 
+
+    application_start()'<div class="Card Component" id="card-0">'+
+            '<p> Test Component<p>'+
+            '</div>'+
+            ''+
+            '<div class="Card Component" id="card-1">'+
+            '<p> Test Component </p>'+
+            '</div>';
 
 /*functions*/
 function intialize() {
-    BotionJSON = JSON.parse(cardJSONArray);
+
+meditor.register("BotionMemory",botionMem.get_Component);
+meditor.register("CardManager", cardMang.get_Component);
+meditor.register("styleManager",styleMang.get_Component);
+
+
+/*
+This is dash board memory
+
+I can create a function that writes dash board memory, 
+
+I can create a function that reads dash board memory.
+
+I can have working memory interaction with my JSON data notionation 
+and have my own specific read and write functions do whatever they want with it.
+*/
+botionMem='<div class="Card Component" id="card-0">'+
+           '<p> Test Component<p>'+
+            '</div>'+
+            ''+
+            '<div class="Card Component" id="card-1">'+
+            '<p> Test Component </p>'+
+            '</div>';
+
+DashBoardNode.append(botionM)
 }
+
+intialize();
+
+
 
 function getListeners(el) {
     return listenerRegistry.get(el) || [];
@@ -314,9 +439,6 @@ document.addEventListener("keyup", (e) => {
                     break;
                 }
         }
-        // if (card0.isClicked == true) {
-        //     card0.htmlref.textContent += keyboardChar;
-        // }
     }
 })
 
@@ -357,19 +479,19 @@ addHabitButton.addEventListener("mouseup", () => {
     const newCard = new Card();
 
 
-    /*Needs to be more modular*/
+
+    /*Create new card*/
     newCard.htmlref = document.createElement("div");
     newCard.htmlref.setAttribute("class", "Card Component");
+    //This right here needs to be more modular
     newCard.htmlref.setAttribute("id", "card-5");
     newCard.htmlref.innerHTML = innerHTMLTemplate;
-    cardsArray.push(Card_deprecated);
+    cardMang.get_cardsArray.push(newCard);
 
 
-    const parentNode = document.getElementById("dash");
 
-    console.log(newCard);
 
-    parentNode.append(newCard.htmlref);
+
 
 
     // This needs to be more modular.

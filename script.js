@@ -12,6 +12,21 @@ const applicationUpdate = new CustomEvent("update", {
     cancelable: true
 }
 );
+
+/* This is my application "Botion" event data variable. 
+    this variable will carry the "state" of my application.
+
+    Factory function
+*/
+function createBotionData(isSelected, prevcard, currentcard, event_) {
+    return
+    {
+        isSelected,
+            previousCard,
+            currentCard,
+            CurrentEvent
+    };
+}
 /*Class delecrations*/
 /*Mediator design pattern used for 
 
@@ -38,33 +53,31 @@ class BotionMediator {
     }
     // function to communicate with application events 
     // function to turn event on
-    enable(eventName, handler)
-    {
+    enable(eventName, handler) {
         /* 
             if this eventName index doesn't 
             exist, then create an empty array
             push handler at this eventName index
         */
-        if(!this.events[eventName])
-        {
+        if (!this.events[eventName]) {
             this.events[eventName] = [];
         }
         this.events[eventName].push(handler);
     }
     // function to communicate with application events
-    disable(eventName,handler)
-    {
-        if(!this.events[eventName])return;
-        this.events[eventName] = this.events[eventName].filter(fn => fn !==handler);
+    disable(eventName, handler) {
+        if (!this.events[eventName]) return;
+        this.events[eventName] = this.events[eventName].filter(fn => fn !== handler);
     }
     //function to communicate with application events
-    dispatch(eventName,data)
-    {
-        if(!this.events[eventName])return;
-        this.events[eventName].forEach(fn =>fn(data));
+    dispatch(eventName, data) {
+        if (!this.events[eventName]) return;
+        this.events[eventName].forEach(fn => fn(data));
+        console.log(eventName);
     }
     component;
     events;
+    previousEvent;
 }
 
 class Component {
@@ -154,20 +167,10 @@ class CardManager {
         this.#cardsArray.push(card_);
         return card_;
     }
-    /* */
-    addClickListener(card_) {
-
-        const cardS_ID = "card_ID: " + card_.getAttribute("id");
-
-
-        // Attach the event listener to the element 
-        card_.addEventListener("mouseup", clickHandler);
-    }
 
     static instance;
     #component;
     #cardsArray = [];
-    #previousCard
 }
 
 /*Style Manager Class */
@@ -301,19 +304,36 @@ class BotionMemory {
 }
 
 
+/*Helper functions */
 
 
 /*Event Listeners*/
 
-
+/*This is probably a little bit confusing 
+ I am using javascripts built-in functionality for a an event 
+ system here, where in all other event handlers it is 100% my custom 
+ code.
+*/
 let updateHandler = function (event) {
     document.dispatchEvent(applicationUpdate);
-    
+
 }
 
+/*Over here check to see if any of the cards have changed, 
+or have been selected etc. */
+let dashBoardUpdateHandler = function (data_) {
+    const card = data_.card_;
+    const event = data_.event;
+    //Check if new card has been selected, and compare that to previous card  
 
-document.addEventListener("update", function (e){
+    //Once you are able to determine the logic above, you can start creating your own functionality.
+}
+/*Application update */
+document.addEventListener("update", function (data) {
+
     console.log("update");
+
+    dashBoardUpdateHandler(data);
 });
 
 /*functions */
@@ -334,12 +354,11 @@ Now I am going to have to add spacing features.
 Check if input is valid then concate the string.
 */
 
-let keyboardHandler = function (e)
-{
-    const character = e.key;
+let keyboardHandler = function (data_) {
+    const character = data_.key;
     let keyboardChar;
     if (character != undefined) {
-        switch (e.key) {
+        switch (data_.key) {
             //This will be remove in the near future this is simply just 
             //how I am building this new feature.
             case "Enter":
@@ -368,13 +387,14 @@ let keyboardHandler = function (e)
                 {
                     keyboardChar += character;
                     break;
+
                 }
         }
     }
-    update_Application();
+    update_Application(null);
 }
-document.addEventListener("keyup", (e) => {
-    keyBoard_Up(e);
+document.addEventListener("keyup", (event) => {
+    keyboardpress_up(event);
 })
 
 
@@ -389,54 +409,95 @@ const addHabitButton = document.getElementById("btn-add");
 
 
 
-let habitButtonH_over= function (event){
-     //Access div container through .html .css attribute
-     const addDivElements = document.getElementsByClassName("Btn");
+let habitButtonH_over = function (event) {
+    //Access div container through .html .css attribute
+    const addDivElements = document.getElementsByClassName("Btn");
 
-     /*This is some pretty hard coded code right here. I am 
-     taking the approach that if I already know the div structure, 
-     therefore I will always be able to accessing my add div structure
-     and then access my addHoverInfo text.
+    /*This is some pretty hard coded code right here. I am 
+    taking the approach that if I already know the div structure, 
+    therefore I will always be able to accessing my add div structure
+    and then access my addHoverInfo text.
  
-     This doesn't feel right, but this is the design choice I am making.
-     */
-     const addHoverInfo = addDivElements[0].children[0];
- 
-     //First way I decided to do it
-     //addHoverInfo.style.visibility="visible";
-     //I perfer working with numbers.
-     addHoverInfo.style.opacity = 1.0;
-     update_Application();
+    This doesn't feel right, but this is the design choice I am making.
+    */
+    const addHoverInfo = addDivElements[0].children[0];
+
+    //First way I decided to do it
+    //addHoverInfo.style.visibility="visible";
+    //I perfer working with numbers.
+    addHoverInfo.style.opacity = 1.0;
+    update_Application(null);
 }
 addHabitButton.addEventListener("mouseover", (event) => {
-   habitButtonH_over(event);
+    habitButtonH_over(null);
 })
 
-let habitButtonH_up = function (event)
-{
+/*
+    If card has been clicked, then set card to selected 
+    if true. then send a message to the dashboard handler 
+    that THIS specific card is being selected.
+*/
+let cardHasBeenSelectedHandler_click = function (data_) {
+    const event = data_.event;
+    const card = data_.card;
+
+    card.isSelected = true;
+
+    console.log(card);
+
+    update_Application(null);
+}
+/*
+    Handlers can do alot, don't try to containerize everything there is 
+    literally no need.
+
+    this is a handler, that uses another handler.
+ */
+
+let addCardButtonHandler_up = function (event) {
     let newCard = new Card();
     newCard.htmlref = cardMang.createCard(newCard.htmlref);
 
-    cardMang.addClickListener(newCard.htmlref);
-
     DashBoardNode.append(newCard.htmlref);
-    update_Application();
+
+    //I have to pass the card into this handler
+    newCard.htmlref.addEventListener("click", (event) => {
+        const data = {card: newCard.htmlref, event: event}
+        cardHasBeenSelected(data);
+    }
+    )
+
+    update_Application(null);
 }
 addHabitButton.addEventListener("mouseup", (event) => {
-    habitButtonH_up(event);
-})
+    addNewCard(event);
+});
 
-let habitButtonH_leave = function(event)
-{
+let addButtonHoverInfoHandler_leave = function (data_) {
+
+    const botionAppData = createBotionData(false, false, false, event);
+
     const addDivElements = document.getElementsByClassName("Btn");
 
     const addHoverInfo = addDivElements[0].children[0];
 
     addHoverInfo.style.opacity = 0.0;
-    update_Application();
+
+    update_Application(null);
 }
+/*
+    Where I place my BotionApplication data structure. Sure 
+    it is more tightly cuppled but, you can always pass a null 
+    BotionApplication data structure and the event system will still 
+    work.
+
+    if the BotionApplication data gets to big you're going to have to use a 
+    different design pattern. For now this is fine.
+ */
 addHabitButton.addEventListener("mouseleave", (event) => {
-    habitButtonH_leave(event);
+    const botionAppData = createBotionData(false, false, false, event);
+
+    addButtonHoverInfo(botionAppData);
 })
 
 /*Functionality/Defintion Code*/
@@ -458,28 +519,51 @@ const DashBoardNode = document.getElementById("dash");
 
 
 /* Custom Event defintions */
-
-function update_Application()
-{
-    meditor.dispatch("applicationUpdate");
+/* 
+ Name conventions for the events should be 
+ there events, what they do.
+*/
+function update_Application(data_) {
+    meditor.dispatch("applicationUpdate", data_);
 }
 
-function keyBoard_Up(event)
-{
-    meditor.dispatch("keyboardup",event);
+function keyboardpress_up(data_) {
+    meditor.dispatch("keyboardup", data_);
 }
 
-function addHabitleave()
-{
-    meditor.dispatch("addmouseleave");
+function addNewCard(data_) {
+    meditor.dispatch("addnewcard", data_);
 }
 
+function cardHasBeenSelected(data_)
+{
+    meditor.dispatch("cardhasbeenselected",data_);
+}
+
+function addButtonHoverInfo(data_) {
+    meditor.dispatch("addbuttonhoverinfo_leave", data_);
+}
+
+function dashBoard_Update(data_) {
+    meditor.dispatch("dashboardupdate".data_);
+}
+
+
+/*This function simply exist to tell the 
+dashboard handler that this current card is being selected */
 
 
 /* Custom Event enabling */
-meditor.enable("addmouseleave",addHabitleave);
-meditor.enable("applicationUpdate",updateHandler);
-meditor.enable("keyboardup",keyboardHandler);
+meditor.enable("applicationUpdate", updateHandler);
+meditor.enable("keyboardup", keyboardHandler);
+
+meditor.enable("addnewcard", addCardButtonHandler_up);
+meditor.enable("cardhasbeenselected", cardHasBeenSelectedHandler_click);
+
+meditor.enable("addbuttonhoverinfo_leave", addButtonHoverInfoHandler_leave);
+meditor.enable("dashboardupdate", dashBoardUpdateHandler);
+
+
 
 /*Application Code  */
 

@@ -37,20 +37,34 @@ class BotionMediator {
         }
     }
     // function to communicate with application events 
-    on(eventName, handler)
+    // function to turn event on
+    enable(eventName, handler)
     {
-
+        /* 
+            if this eventName index doesn't 
+            exist, then create an empty array
+            push handler at this eventName index
+        */
+        if(!this.events[eventName])
+        {
+            this.events[eventName] = [];
+        }
+        this.events[eventName].push(handler);
     }
     // function to communicate with application events
-    off(eventName,handler)
+    disable(eventName,handler)
     {
-
+        if(!this.events[eventName])return;
+        this.events[eventName] = this.events[eventName].filter(fn => fn !==handler);
     }
     //function to communicate with application events
-    emit(eventName,data)
+    dispatch(eventName,data)
     {
-
+        if(!this.events[eventName])return;
+        this.events[eventName].forEach(fn =>fn(data));
     }
+    component;
+    events;
 }
 
 class Component {
@@ -340,6 +354,33 @@ class BotionMemory {
      | 
     UI_Update() <-Again your code 
 */
+
+let updateHandler = function (event) {
+
+}
+
+let keyboardHandler = function (event){
+
+}
+let addHabitHandler_over = function(event)
+{
+
+}
+let addHabitHandler_up = function(event)
+{
+
+}
+let addHabitHandler_down = function(event)
+{
+
+}
+let addHabitHandler_leave = function(event)
+{
+    console.log("testing customized event");
+}
+
+
+
 document.addEventListener("update", (event) => {
     console.log('custom event trigger:', event.detail.message);
 });
@@ -410,7 +451,7 @@ I've gone with the design choice of injecting my javascript code after the DOM f
 const addHabitButton = document.getElementById("btn-add");
 
 //works
-addHabitButton.addEventListener("mouseover", () => {
+addHabitButton.addEventListener("mouseover", (event) => {
     //Access div container through .html .css attribute
     const addDivElements = document.getElementsByClassName("Btn");
 
@@ -432,7 +473,7 @@ addHabitButton.addEventListener("mouseover", () => {
 
 })
 
-addHabitButton.addEventListener("mouseup", () => {
+addHabitButton.addEventListener("mouseup", (event) => {
     let newCard = new Card();
     newCard.htmlref = cardMang.createCard(newCard.htmlref);
 
@@ -443,7 +484,7 @@ addHabitButton.addEventListener("mouseup", () => {
     update_UI();
 })
 
-addHabitButton.addEventListener("mouseleave", () => {
+addHabitButton.addEventListener("mouseleave", (event) => {
 
     const addDivElements = document.getElementsByClassName("Btn");
 
@@ -470,6 +511,14 @@ const DashBoardNode = document.getElementById("dash");
 
 /*Global variables */
 
+
+/* Personalized Events */
+
+meditor.enable("addmouseleave",addHabitHandler_leave);
+function addHabitleave()
+{
+    meditor.dispatch("addmouseleave");
+}
 
 /*Application Code  */
 

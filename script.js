@@ -4,6 +4,14 @@
  * License: Do not copy or redistribute without permission.
  */
 
+/*Functionality/Defintion Code */
+
+const applicationUpdate = new CustomEvent("update", {
+    detail: { message: 'this is my update event for my botion application' },
+    bubbles: true,
+    cancelable: true
+}
+);
 /*Class delecrations*/
 /*Mediator design pattern used for 
 
@@ -11,20 +19,37 @@ Define an objec that encapsualtes how a set of objects interact. Mediator promot
 loose coupling by keeeping objects from referring to each other explicitly, and it lets you 
 vary their interaction indepedently. 
 */
+
 class BotionMediator {
     constructor() {
         this.components = {};
+        this.events = {};
     }
-
+    // function to communicate with application components
     register(name, component) {
         this.components[name] = component;
         component.setMediator(this);
     }
-
+    // function to communicate with application components
     send(message, from, to) {
         if (this.components[to]) {
             this.components[to].receive(message, from);
         }
+    }
+    // function to communicate with application events 
+    on(eventName, handler)
+    {
+
+    }
+    // function to communicate with application events
+    off(eventName,handler)
+    {
+
+    }
+    //function to communicate with application events
+    emit(eventName,data)
+    {
+
     }
 }
 
@@ -55,14 +80,15 @@ class Component {
 /*The Card class definition */
 class Card {
     constructor() {
-        this.isClicked = false;
+        this.isSelected = false;
         this.hasChanged = false;
         this.htmlref = HTMLElement;
+        this.id;
     }
     update() {
 
     }
-    isClicked = false;
+    isSelected = false;
     hasChanged = false;
     htmlref = null;
 
@@ -78,6 +104,7 @@ class CardManager {
         this.#component = new Component("CardManager");
         this.#component.updateComponent = this.update_Component;
         this.#cardsArray = [];
+        this.#listenerRegistry = new WeakMap();
     }
 
     static getInstance() {
@@ -104,19 +131,57 @@ class CardManager {
         return this.#cardsArray;
     }
 
+    get get_listenerRegistry() {
+        return this.#listenerRegistry;
+    }
+
+    /*Working with an html element here*/
     createCard(card_) {
         card_ = document.createElement("div");
         card_.setAttribute("class", "Card Component");
-        card_.setAttribute("id", "card-" + (cardsArray.length + 1)); //ID's will always start at 1.
-        this.#cardsArray.push(card_);
+        card_.setAttribute("id", "card-" + (this.#cardsArray.length + 1)); //ID's will always start at 1.
         this.#component.send(card_, "StyleManager");
+        this.#cardsArray.push(card_);
         return card_;
     }
+    /* */
+    addClickListener(card_) {
+
+        const cardS_ID = "card_ID: " + card_.getAttribute("id");
+
+        /*Might have to add alot of functionality here
+            If card was clicked 
+            if other card was click therefore 
+            previously unselect the last selected card, etc, etc.
+        */
+        let clickHandler = function (event) {
+            /*If the card selected is a different card from, the 
+            previously selected card.
+            */
+            if (CardManager.getInstance().#previousCard != card_) {
+                CardManager.getInstance().#previousCard = card_;
+                CardManager.getInstance().#previousCard.isSelected = false;
+                card_.isSelected = true;
+                console.log("Previous card has been unselected");
+            } else { // if current card has been selected
+
+            }
+            console.log(cardS_ID);
+            console.log(CardManager.getInstance().#listenerRegistry);
+            update_UI();
+        };
+
+        this.#listenerRegistry.set(card_, clickHandler);
+
+        // Attach the event listener to the element 
+        card_.addEventListener("mouseup", clickHandler);
+    }
+
     static instance;
     #component;
     #cardsArray = [];
-    x
-
+    #listenerRegistry;
+    #previousCard
 }
 
 /*Style Manager Class */
@@ -129,6 +194,7 @@ class StyleManager {
         this.#component = new Component("Style");
         this.#component.updateComponent = this.update_Component;
         this.#style = document.createElement("style");
+        this.#style.setAttribute("id", "mod-style");
     }
 
     static getInstance() {
@@ -140,6 +206,12 @@ class StyleManager {
 
     /*Concrete component functionality */
     update_Component(message) {
+        /*
+            Just a reminder when you're calling this function 
+
+            "this" does not refer to, the styleManager instance, "this" refers to actually 
+            whatever manager or component is calling it.
+        */
         /* 
          Here take the current card and then update its style attributes and then append 
          to the document object model.
@@ -152,14 +224,32 @@ class StyleManager {
         //     '#card-5.Card.Component p {opacity:0.3; font-size:12px; text-align:center;}'
         //    document.head.appendChild(style);
 
+
+        /*Becare when usings strings to build stuff. */
+        const styleTemplate = `#${message.getAttribute("id")}.Card.Component { width:140px; height:140px; padding:10px;background-color:#669171; overflow-wrap:anywhere; border: 2.5px solid #0c0d0c; opacity:0.5;` +
+            '}' +
+            `#${message.getAttribute("id")}.Card.Component p {opacity:0.3; font-size:12px; text-align:center;}`;
+
         const s = StyleManager.getInstance().get_Style;
 
+        /*I have to check first if the 
+            modular stylesheet exist 
 
-        s.textContent = `#${message.getAttribute("id")}.Card.Component{width:70px; height:70p; padding:10px;background-color:#669171; overflow-wrap:anywhere; border: 2.5px solid #0c0d0c`+       
-        '}'+
-        `#${message.getAttribute("id")}.Card.Component p {opacity:0.3' font-size:12px; text-align:center;}`;
-        console.log(message.getAttribute("id"));
-        document.head.append(s);
+            and then append after the previous node.
+        */
+
+
+        /*
+        To properly append what you need to do is 
+        access the modular style sheet. 
+        
+        then add the node that you want to add.
+        */
+        const sNode = document.getElementById("mod-style");
+        sNode.append(styleTemplate);
+
+
+
     }
     get get_Component() {
         return this.#component;
@@ -183,9 +273,7 @@ class BotionMemory {
         this.#component = new Component("BotionApp")
         this.#component.updateComponent = this.update_Component;
     }
-    update_UI() {
 
-    }
 
     /*Concrete component functionality */
     update_Component(message) {
@@ -227,145 +315,11 @@ class BotionMemory {
 }
 
 
-//Instantiate Botion Mem
-//Instantiate BotionMediator 
-//Instantiate CardMang
-//Instantiate styleMang
-//Instantiate DashBoard
-const botionMem = new BotionMemory();
-const meditor = new BotionMediator();
-const cardMang = new CardManager();
-const styleMang = new StyleManager();
-const DashBoardNode = document.getElementById("dash");
-
-
-/*pre-defined objects */
-let cardJSONArray = '{ "cardData":[' +
-    '{ "title":" " , "text":" " }]}';
-let DashboardJSON = ""; //haven't written it yet
-/*This is my JSON object that stores all my web application data*/
-let BotionJSON = ""; //haven't written it yet
-/*keyboard input variable*/
-let keyboardChar = "";
-// Innerhtml templates 
-const innerHTMLTemplate = '<p>"Test Component" </p>';
-/*Somewhere to hold all the event listeners. */
-const listenerRegistry = new WeakMap();
-//card object\
-/*You can change the changes of the 
-card by having a very very simple update tick system 
-that checks to see if anything has change.*/
-//const Card_deprecated = {
-//   htmlref: HTMLElement,
-//    isClicked: false,
-//    hasChanged: false,
-//    update() // if anything happens to the card update the contents of the card
-//    {
-
-//    }
-//}
 
 
 
 
-
-/* 
-    Testing out how to inject css into Botion
-*/
-
-// if(styleSheet && styleSheet.cssRules){
-//     for(let rule of styleSheet.cssRules)
-//     {
-//         console.log(rule.cssText);
-//     }
-// }
-//botion object 
-/* 
-    I am going to be creating an 
-    boitionObject that contains all the "working information" of my application 
-    so things are alittle bit more composite. I don't want to have a bunch of 
-    global variables.
-
-    If there are some over lap with some global variables I plan to remove the global variables.
-*/
-const botionObj = {
-    BotionJSON: "",
-    DashboardJSON: "",
-}
-
-let cardsArray = [];
-/*pre-defined objects*/
-
-
-/*Casually re-writing browser Javascript functionality */
-const originalAdd = EventTarget.prototype.addEventListener;
-//With this piece of code I just re-wrote Browser Javascript functionality
-EventTarget.prototype.addEventListener = function (type, listener, options) {
-    if (!listenerRegistry.has(this)) {
-        listenerRegistry.set(this, []);
-    }
-    listenerRegistry.get(this).push({ type, listener, options });
-    originalAdd.call(this, type, listener, options);
-};
-
-/*
-Just a note that I want to bring up. Depending on where I inject 
-my javascript code in the html file, this code below will either run before 
-the DOM has been fully loaded or after.
-
-I've gone with the design choice of injecting my javascript code after the DOM file has mostly loaded.
-*/
-const addHabitButton = document.getElementById("btn-add");
-
-
-/*
-    You can have like a group of functions that work in this order 
-
-    application_start()'<div class="Card Component" id="card-0">'+
-            '<p> Test Component<p>'+
-            '</div>'+
-            ''+
-            '<div class="Card Component" id="card-1">'+
-            '<p> Test Component </p>'+
-            '</div>';
-
-/*functions*/
-function intialize() {
-
-    meditor.register("BotionMemory", botionMem.get_Component);
-    meditor.register("CardManager", cardMang.get_Component);
-    meditor.register("StyleManager", styleMang.get_Component);
-
-    document.head.appendChild(styleMang.get_Style);
-
-    /*
-    This is dash board memory
-    
-    I can create a function that writes dash board memory, 
-    
-    I can create a function that reads dash board memory.
-    
-    I can have working memory interaction with my JSON data notionation 
-    and have my own specific read and write functions do whatever they want with it.
-    */
-    // botionMem='<div class="Card Component" id="card-0">'+
-    //            '<p> Test Component<p>'+
-    //             '</div>'+
-    //             ''+
-    //             '<div class="Card Component" id="card-1">'+
-    //             '<p> Test Component </p>'+
-    //             '</div>';
-
-    // DashBoardNode.append(botionM)
-}
-
-intialize();
-
-
-
-function getListeners(el) {
-    return listenerRegistry.get(el) || [];
-}
+/*Event Listeners*/
 
 /*
     Over here you'll have your respective types of 
@@ -373,28 +327,25 @@ function getListeners(el) {
 
     if it is a card, then update the card function, and update the 
     associated json information.
+
+    here you can literally just check up with the system component's
+
+    To put this into proper context, your loop is like this 
+
+    start() <- google-chrome 
+     |
+   Intialize() <- your code
+     | 
+    EventListeners() <- something you don't see easily 
+     | 
+    UI_Update() <-Again your code 
 */
-function UI_Update(UI_element) {
-    if (UI_element.isClicked) {
-        /*Update according to the 
-        type of element you're dealing with? */
-        switch (UI_element) {
+document.addEventListener("update", (event) => {
+    console.log('custom event trigger:', event.detail.message);
+});
 
-            case Card:
-                {
-                    console.log("tried to update a UI_card element");
-                    break;
-                }
-        }
-    }
-}
-/*over here botion will update itself and the clients browser logic*/
-botionObj.update = function (data_) {
-
-}
 /*functions */
 
-/*Event Listeners*/
 /*
  5-15-2025 Feature 
  
@@ -445,24 +396,18 @@ document.addEventListener("keyup", (e) => {
                 }
         }
     }
+    update_UI();
 })
 
+
 /*
-* I think that because you're planning to have n amount of cards 
+Just a note that I want to bring up. Depending on where I inject 
+my javascript code in the html file, this code below will either run before 
+the DOM has been fully loaded or after.
 
-what you need to do when it comes to adding the event listeners, is that 
-you need to give a a signature, that doesn't do anything. The set/define the signuature 
-when you actually create the card.
+I've gone with the design choice of injecting my javascript code after the DOM file has mostly loaded.
 */
-
-// card0.htmlref.addEventListener("mouseup", () => {
-
-//     console.log("This card has been selected");
-
-//     //This needs to be more modular.
-//     card0.isClicked = true;
-//     UI_Update(card0);
-// })
+const addHabitButton = document.getElementById("btn-add");
 
 //works
 addHabitButton.addEventListener("mouseover", () => {
@@ -483,7 +428,7 @@ addHabitButton.addEventListener("mouseover", () => {
     //I perfer working with numbers.
     addHoverInfo.style.opacity = 1.0;
 
-
+    update_UI();
 
 })
 
@@ -491,15 +436,11 @@ addHabitButton.addEventListener("mouseup", () => {
     let newCard = new Card();
     newCard.htmlref = cardMang.createCard(newCard.htmlref);
 
+    cardMang.addClickListener(newCard.htmlref);
 
     DashBoardNode.append(newCard.htmlref);
 
-
-    // // This needs to be more modular.
-    // style.textContent = '#card-5.Card.Component{ width:70px; height:70p; padding:10px;background-color:#669171; overflow-wrap:anywhere; border: 2.5px solid #0c0d0c' +
-    //     '}' +
-    //     '#card-5.Card.Component p {opacity:0.3; font-size:12px; text-align:center;}'
-    //    document.head.appendChild(style);
+    update_UI();
 })
 
 addHabitButton.addEventListener("mouseleave", () => {
@@ -509,18 +450,70 @@ addHabitButton.addEventListener("mouseleave", () => {
     const addHoverInfo = addDivElements[0].children[0];
 
     addHoverInfo.style.opacity = 0.0;
+    update_UI();
 })
 
+/*Functionality/Defintion Code*/
 
-/*Event Listeners*/
-/*UI Update 
+/*Global variables */
 
-At the end of every event listener function, 
+//Instantiate Botion Mem
+//Instantiate BotionMediator 
+//Instantiate CardMang
+//Instantiate styleMang
+//Instantiate DashBoard
+const botionMem = new BotionMemory();
+const meditor = new BotionMediator();
+const cardMang = new CardManager();
+const styleMang = new StyleManager();
+const DashBoardNode = document.getElementById("dash");
 
-I can simply just call the update function, and pass it, its respective UI function update.
-*/
+/*Global variables */
 
 
-console.log(listenerRegistry);
+/*Application Code  */
+
+/*This is where the application code lives, or application logic lives*/
+
+function intialize() {
+
+    meditor.register("BotionMemory", botionMem.get_Component);
+    meditor.register("CardManager", cardMang.get_Component);
+    meditor.register("StyleManager", styleMang.get_Component);
+
+    document.head.appendChild(styleMang.get_Style);
+
+    /*
+    This is dash board memory
+    
+    I can create a function that writes dash board memory, 
+    
+    I can create a function that reads dash board memory.
+    
+    I can have working memory interaction with my JSON data notionation 
+    and have my own specific read and write functions do whatever they want with it.
+    */
+    // botionMem='<div class="Card Component" id="card-0">'+
+    //            '<p> Test Component<p>'+
+    //             '</div>'+
+    //             ''+
+    //             '<div class="Card Component" id="card-1">'+
+    //             '<p> Test Component </p>'+
+    //             '</div>';
+
+    // DashBoardNode.append(botionM)
+}
+
+function update_UI() {
+    document.dispatchEvent(applicationUpdate);
+}
+
+/*Application Code  */
+
+
+
+intialize();
+update_UI();
+
 
 

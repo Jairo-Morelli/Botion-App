@@ -118,7 +118,6 @@ class CardManager {
         this.#component = new Component("CardManager");
         this.#component.updateComponent = this.update_Component;
         this.#cardsArray = [];
-        this.#listenerRegistry = new WeakMap();
     }
 
     static getInstance() {
@@ -145,9 +144,6 @@ class CardManager {
         return this.#cardsArray;
     }
 
-    get get_listenerRegistry() {
-        return this.#listenerRegistry;
-    }
 
     /*Working with an html element here*/
     createCard(card_) {
@@ -163,29 +159,6 @@ class CardManager {
 
         const cardS_ID = "card_ID: " + card_.getAttribute("id");
 
-        /*Might have to add alot of functionality here
-            If card was clicked 
-            if other card was click therefore 
-            previously unselect the last selected card, etc, etc.
-        */
-        let clickHandler = function (event) {
-            /*If the card selected is a different card from, the 
-            previously selected card.
-            */
-            if (CardManager.getInstance().#previousCard != card_) {
-                CardManager.getInstance().#previousCard = card_;
-                CardManager.getInstance().#previousCard.isSelected = false;
-                card_.isSelected = true;
-                console.log("Previous card has been unselected");
-            } else { // if current card has been selected
-
-            }
-            console.log(cardS_ID);
-            console.log(CardManager.getInstance().#listenerRegistry);
-            update_UI();
-        };
-
-        this.#listenerRegistry.set(card_, clickHandler);
 
         // Attach the event listener to the element 
         card_.addEventListener("mouseup", clickHandler);
@@ -194,7 +167,6 @@ class CardManager {
     static instance;
     #component;
     #cardsArray = [];
-    #listenerRegistry;
     #previousCard
 }
 
@@ -331,58 +303,17 @@ class BotionMemory {
 
 
 
-
-
 /*Event Listeners*/
 
-/*
-    Over here you'll have your respective types of 
-    UI updates, 
-
-    if it is a card, then update the card function, and update the 
-    associated json information.
-
-    here you can literally just check up with the system component's
-
-    To put this into proper context, your loop is like this 
-
-    start() <- google-chrome 
-     |
-   Intialize() <- your code
-     | 
-    EventListeners() <- something you don't see easily 
-     | 
-    UI_Update() <-Again your code 
-*/
 
 let updateHandler = function (event) {
-
-}
-
-let keyboardHandler = function (event){
-
-}
-let addHabitHandler_over = function(event)
-{
-
-}
-let addHabitHandler_up = function(event)
-{
-
-}
-let addHabitHandler_down = function(event)
-{
-
-}
-let addHabitHandler_leave = function(event)
-{
-    console.log("testing customized event");
+    document.dispatchEvent(applicationUpdate);
+    
 }
 
 
-
-document.addEventListener("update", (event) => {
-    console.log('custom event trigger:', event.detail.message);
+document.addEventListener("update", function (e){
+    console.log("update");
 });
 
 /*functions */
@@ -402,8 +333,11 @@ Now I am going to have to add spacing features.
 
 Check if input is valid then concate the string.
 */
-document.addEventListener("keyup", (e) => {
+
+let keyboardHandler = function (e)
+{
     const character = e.key;
+    let keyboardChar;
     if (character != undefined) {
         switch (e.key) {
             //This will be remove in the near future this is simply just 
@@ -437,7 +371,10 @@ document.addEventListener("keyup", (e) => {
                 }
         }
     }
-    update_UI();
+    update_Application();
+}
+document.addEventListener("keyup", (e) => {
+    keyBoard_Up(e);
 })
 
 
@@ -450,48 +387,56 @@ I've gone with the design choice of injecting my javascript code after the DOM f
 */
 const addHabitButton = document.getElementById("btn-add");
 
-//works
+
+
+let habitButtonH_over= function (event){
+     //Access div container through .html .css attribute
+     const addDivElements = document.getElementsByClassName("Btn");
+
+     /*This is some pretty hard coded code right here. I am 
+     taking the approach that if I already know the div structure, 
+     therefore I will always be able to accessing my add div structure
+     and then access my addHoverInfo text.
+ 
+     This doesn't feel right, but this is the design choice I am making.
+     */
+     const addHoverInfo = addDivElements[0].children[0];
+ 
+     //First way I decided to do it
+     //addHoverInfo.style.visibility="visible";
+     //I perfer working with numbers.
+     addHoverInfo.style.opacity = 1.0;
+     update_Application();
+}
 addHabitButton.addEventListener("mouseover", (event) => {
-    //Access div container through .html .css attribute
-    const addDivElements = document.getElementsByClassName("Btn");
-
-    /*This is some pretty hard coded code right here. I am 
-    taking the approach that if I already know the div structure, 
-    therefore I will always be able to accessing my add div structure
-    and then access my addHoverInfo text.
-
-    This doesn't feel right, but this is the design choice I am making.
-    */
-    const addHoverInfo = addDivElements[0].children[0];
-
-    //First way I decided to do it
-    //addHoverInfo.style.visibility="visible";
-    //I perfer working with numbers.
-    addHoverInfo.style.opacity = 1.0;
-
-    update_UI();
-
+   habitButtonH_over(event);
 })
 
-addHabitButton.addEventListener("mouseup", (event) => {
+let habitButtonH_up = function (event)
+{
     let newCard = new Card();
     newCard.htmlref = cardMang.createCard(newCard.htmlref);
 
     cardMang.addClickListener(newCard.htmlref);
 
     DashBoardNode.append(newCard.htmlref);
-
-    update_UI();
+    update_Application();
+}
+addHabitButton.addEventListener("mouseup", (event) => {
+    habitButtonH_up(event);
 })
 
-addHabitButton.addEventListener("mouseleave", (event) => {
-
+let habitButtonH_leave = function(event)
+{
     const addDivElements = document.getElementsByClassName("Btn");
 
     const addHoverInfo = addDivElements[0].children[0];
 
     addHoverInfo.style.opacity = 0.0;
-    update_UI();
+    update_Application();
+}
+addHabitButton.addEventListener("mouseleave", (event) => {
+    habitButtonH_leave(event);
 })
 
 /*Functionality/Defintion Code*/
@@ -512,13 +457,29 @@ const DashBoardNode = document.getElementById("dash");
 /*Global variables */
 
 
-/* Personalized Events */
+/* Custom Event defintions */
 
-meditor.enable("addmouseleave",addHabitHandler_leave);
+function update_Application()
+{
+    meditor.dispatch("applicationUpdate");
+}
+
+function keyBoard_Up(event)
+{
+    meditor.dispatch("keyboardup",event);
+}
+
 function addHabitleave()
 {
     meditor.dispatch("addmouseleave");
 }
+
+
+
+/* Custom Event enabling */
+meditor.enable("addmouseleave",addHabitleave);
+meditor.enable("applicationUpdate",updateHandler);
+meditor.enable("keyboardup",keyboardHandler);
 
 /*Application Code  */
 
@@ -553,16 +514,13 @@ function intialize() {
     // DashBoardNode.append(botionM)
 }
 
-function update_UI() {
-    document.dispatchEvent(applicationUpdate);
-}
 
 /*Application Code  */
 
 
 
 intialize();
-update_UI();
+update_Application();
 
 
 

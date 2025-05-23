@@ -13,20 +13,6 @@ const applicationUpdate = new CustomEvent("update", {
 }
 );
 
-/* This is my application "Botion" event data variable. 
-    this variable will carry the "state" of my application.
-
-    Factory function
-*/
-function createBotionData(isSelected, prevcard, currentcard, event_) {
-    return
-    {
-        isSelected,
-            previousCard,
-            currentCard,
-            CurrentEvent
-    };
-}
 /*Class delecrations*/
 /*Mediator design pattern used for 
 
@@ -34,7 +20,6 @@ Define an objec that encapsualtes how a set of objects interact. Mediator promot
 loose coupling by keeeping objects from referring to each other explicitly, and it lets you 
 vary their interaction indepedently. 
 */
-
 class BotionMediator {
     constructor() {
         this.components = {};
@@ -121,7 +106,14 @@ class Card {
 
 }
 
-/*Card Manager Class */
+/*Card Manager Class 
+    - Card Manager class should maintain collection of cards 
+    - Card Manager should create classes like a factory class 
+    - Card Manager should delete cards 
+    - Card Manager should edit cards 
+
+    Card manager DOES NOT CARRY STATE OF CARDS.
+*/
 class CardManager {
     constructor() {
         if (CardManager.instance) {
@@ -168,12 +160,22 @@ class CardManager {
         return card_;
     }
 
+    
+
     static instance;
     #component;
     #cardsArray = [];
 }
 
-/*Style Manager Class */
+
+/*Style Manager Class 
+    - Style Manager class should maintain collection of cards 
+    - Style Manager should create classes like a factory class 
+    - Style Manager should delete cards 
+    - Style Manager should edit cards 
+
+    Style manager DOES NOT CARRY STATE OF CARDS.
+*/
 class StyleManager {
     constructor() {
         if (StyleManager.instance) {
@@ -201,39 +203,15 @@ class StyleManager {
             "this" does not refer to, the styleManager instance, "this" refers to actually 
             whatever manager or component is calling it.
         */
-        /* 
-         Here take the current card and then update its style attributes and then append 
-         to the document object model.
-        */
-
-
-        // // This needs to be more modular.
-        // style.textContent = '#card-5.Card.Component{ width:70px; height:70p; padding:10px;background-color:#669171; overflow-wrap:anywhere; border: 2.5px solid #0c0d0c' +
-        //     '}' +
-        //     '#card-5.Card.Component p {opacity:0.3; font-size:12px; text-align:center;}'
-        //    document.head.appendChild(style);
-
-
-        /*Becare when usings strings to build stuff. */
+   
+        /*be careful when usings strings to build stuff. */
         const styleTemplate = `#${message.getAttribute("id")}.Card.Component { width:140px; height:140px; padding:10px;background-color:#669171; overflow-wrap:anywhere; border: 2.5px solid #0c0d0c; opacity:0.5;` +
             '}' +
             `#${message.getAttribute("id")}.Card.Component p {opacity:0.3; font-size:12px; text-align:center;}`;
 
         const s = StyleManager.getInstance().get_Style;
 
-        /*I have to check first if the 
-            modular stylesheet exist 
 
-            and then append after the previous node.
-        */
-
-
-        /*
-        To properly append what you need to do is 
-        access the modular style sheet. 
-        
-        then add the node that you want to add.
-        */
         const sNode = document.getElementById("mod-style");
         sNode.append(styleTemplate);
 
@@ -251,8 +229,26 @@ class StyleManager {
     #style;
 }
 
-/*The Class that will be the "working" memory of Botion 
-web application */
+/* This is my application "Botion" event data variable. 
+    this variable will carry the "state" of my application.
+
+    Factory function
+*/ 
+function createBotionData(isSelected, prevcard, currentcard, event_) {
+    return
+    {
+        isSelected,
+            previousCard,
+            currentCard,
+            CurrentEvent
+    };
+}
+/*
+The Class that will be the "working" memory of Botion web application
+
+this is almost exactly like the managers, but it will probably carry state of the application. Which 
+makes sense in this case.
+*/
 class BotionMemory {
     constructor() {
         if (BotionMemory.instance) {
@@ -302,9 +298,6 @@ class BotionMemory {
     #dashboardJSON;
     #component;
 }
-
-
-/*Helper functions */
 
 
 /*Event Listeners*/
@@ -397,17 +390,7 @@ document.addEventListener("keyup", (event) => {
     keyboardpress_up(event);
 })
 
-
-/*
-Just a note that I want to bring up. Depending on where I inject 
-my javascript code in the html file, this code below will either run before 
-the DOM has been fully loaded or after.
-
-I've gone with the design choice of injecting my javascript code after the DOM file has mostly loaded.
-*/
 const addHabitButton = document.getElementById("btn-add");
-
-
 
 let habitButtonH_over = function (event) {
     //Access div container through .html .css attribute
@@ -432,11 +415,6 @@ addHabitButton.addEventListener("mouseover", (event) => {
     habitButtonH_over(null);
 })
 
-/*
-    If card has been clicked, then set card to selected 
-    if true. then send a message to the dashboard handler 
-    that THIS specific card is being selected.
-*/
 let cardHasBeenSelectedHandler_click = function (data_) {
     const event = data_.event;
     const card = data_.card;
@@ -450,8 +428,10 @@ let cardHasBeenSelectedHandler_click = function (data_) {
 /*
     Handlers can do alot, don't try to containerize everything there is 
     literally no need.
+    this is a handler, that uses another handler. 
 
-    this is a handler, that uses another handler.
+    You have it setup so the handlers are loosely coupled with the 
+    Botion application.
  */
 
 let addCardButtonHandler_up = function (event) {
@@ -487,7 +467,7 @@ let addButtonHoverInfoHandler_leave = function (data_) {
 }
 /*
     Where I place my BotionApplication data structure. Sure 
-    it is more tightly cuppled but, you can always pass a null 
+    it is more tightly coupled now but, you can always pass a null 
     BotionApplication data structure and the event system will still 
     work.
 
@@ -520,7 +500,7 @@ const DashBoardNode = document.getElementById("dash");
 
 /* Custom Event defintions */
 /* 
- Name conventions for the events should be 
+ Naming conventions for the events should be 
  there events, what they do.
 */
 function update_Application(data_) {
@@ -549,10 +529,6 @@ function dashBoard_Update(data_) {
 }
 
 
-/*This function simply exist to tell the 
-dashboard handler that this current card is being selected */
-
-
 /* Custom Event enabling */
 meditor.enable("applicationUpdate", updateHandler);
 meditor.enable("keyboardup", keyboardHandler);
@@ -566,8 +542,12 @@ meditor.enable("dashboardupdate", dashBoardUpdateHandler);
 
 
 /*Application Code  */
+/* 
+ The way it works now is that I intialize my application 
+ and my application is jumping all over the place, because of the event system.
 
-/*This is where the application code lives, or application logic lives*/
+This will probably be the shortest part of my code base.
+*/
 
 function intialize() {
 
@@ -577,25 +557,6 @@ function intialize() {
 
     document.head.appendChild(styleMang.get_Style);
 
-    /*
-    This is dash board memory
-    
-    I can create a function that writes dash board memory, 
-    
-    I can create a function that reads dash board memory.
-    
-    I can have working memory interaction with my JSON data notionation 
-    and have my own specific read and write functions do whatever they want with it.
-    */
-    // botionMem='<div class="Card Component" id="card-0">'+
-    //            '<p> Test Component<p>'+
-    //             '</div>'+
-    //             ''+
-    //             '<div class="Card Component" id="card-1">'+
-    //             '<p> Test Component </p>'+
-    //             '</div>';
-
-    // DashBoardNode.append(botionM)
 }
 
 

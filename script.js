@@ -14,6 +14,7 @@ const applicationUpdate = new CustomEvent("update", {
 }
 );
 /*Class delecrations*/
+//probably not going to use this.
 class DashBoardManager {
     constructor() {
         if (DashBoardManager.instance) {
@@ -22,6 +23,7 @@ class DashBoardManager {
         DashBoardManager.instance = this;
         this.#components = new Component("dashBoardManager");
         this.#components.updateComponent = this.update_Component;
+        this.#mediator = new Mediator();
     }
 
     static getInstance() {
@@ -30,7 +32,12 @@ class DashBoardManager {
         }
         return DashBoardManager.instance;
     }
-
+    /* 
+    I don't need this, actually for updating my Botion application. Which is funny. 
+    The way I have my update functions for my application loop, is exactly extremely loosely coupled, 
+    in relation to actual class/object. I can maintain this lose coupling because the way, my update functions 
+    actually run is through my event system. It isn't really linked to any of my specific calls.
+    */
     update_Component(message) {
 
     }
@@ -39,21 +46,41 @@ class DashBoardManager {
     get get_Component() {
         return this.#components;
     }
+
+    /*setters*/
+    set set_BotionAppEventData(data_) {
+        this.#eventData = data_;
+    }
     static instance;
     #components;
-    currentCard;
+    #mediator;
+    #eventData;
 }
 
+/*
+    BotionAppEventData also controls 
+    application state. 
 
+    this class will do alot of the heavy lifting. Of my application functionality.
+
+    The reason this works so well, is that I can have mutliple different types of state for different objects, 
+    and have there functionality be change literally because of a string. 
+
+    And funnily enough, it is still loosely coupled to the application.
+
+    No need for a state class.
+*/
 class BotionAppEventData {
-    constructor(eventType_, currentCard_, detail_) {
+    constructor(eventType_, currentCard_, state_) {
         this.eventType = eventType_;
         this.currentCard = currentCard_;
-        this.detail = detail_;
+        this.state = state_;
+        this.text="";
     }
 }
 
 //Probably not going to use this LOL. Over kill for this assignment
+//Probably still not going to use this, but I am using it as an example.
 /* The Botion app object can be in one of several different states: 
 Updating, Reading, Writing, etc. The Botion app object, will change its state 
 depending on the request its receives, probably in most cases from the mediator.*/
@@ -87,10 +114,12 @@ Define an objec that encapsualtes how a set of objects interact. Mediator promot
 loose coupling by keeeping objects from referring to each other explicitly, and it lets you 
 vary their interaction indepedently. 
 */
-class BotionMediator {
+class Mediator {
     constructor() {
         this.components = {};
         this.events = {};
+        this.component= new Component("Mediator");
+        this.component.setMediator(this);
     }
     // function to communicate with application components
     register(name, component) {
@@ -127,9 +156,15 @@ class BotionMediator {
         this.events[eventName].forEach(fn => fn(data));
         console.log(eventName);
     }
+    
+    /*Getters*/
+    get get_component()
+    {
+        return this.component;
+    }
     component;
+    components;
     events;
-    previousEvent;
 }
 
 class Component {
@@ -155,6 +190,10 @@ class Component {
     updateComponent = function (message) { };
 }
 
+/*Cards potential states 
+ - idle
+ - selected 
+*/
 
 /*The Card class definition */
 class Card {
@@ -163,14 +202,42 @@ class Card {
         this.hasChanged = false;
         this.htmlref = HTMLElement;
         this.id;
+        this.state = 'idle';
+        this.cardText = "";
     }
-    update() {
 
+    set text(text_)
+    {
+        this.#cardText=text_;
     }
-    isSelected = false;
-    hasChanged = false;
-    htmlref = null;
 
+    setState(newState_) {
+        this.state = newState_;
+
+        switch (this.state) {
+            case "idle":
+                {
+                    this.isSelected = false;
+                    break;
+                }
+            case "selected":
+                {
+                    this.isSelected = true;
+                    break;
+                }
+            default: {
+                break;
+            }
+        }
+    }
+
+
+    isSelected;
+    hasChanged;
+    htmlref;
+    id;
+    #state;
+    #cardText;
 }
 
 /*Card Manager Class 
@@ -206,6 +273,8 @@ class CardManager {
     /*Concrete component functionality */
     update_Component(message) {
 
+        //console.log(message);
+
     }
 
     /*getters*/
@@ -218,7 +287,6 @@ class CardManager {
     }
 
 
-    /*Working with an html element here*/
     createCard(card_) {
         card_ = document.createElement("div");
         card_.setAttribute("class", "Card Component");
@@ -226,6 +294,11 @@ class CardManager {
         this.#component.send(card_, "StyleManager");
         this.#cardsArray.push(card_);
         return card_;
+    }
+
+    RemoveCard(card_)
+    {
+
     }
 
 
@@ -264,6 +337,7 @@ class StyleManager {
     }
 
     /*Concrete component functionality */
+    // Just a note here, you can add switch cases, in order to have different functionality inside your update_component function
     update_Component(message) {
         /*
             Just a reminder when you're calling this function 
@@ -297,20 +371,6 @@ class StyleManager {
     #style;
 }
 
-/* This is my application "Botion" event data variable. 
-    this variable will carry the "state" of my application.
-
-    Factory function
-*/
-function createBotionData(isSelected, prevcard, currentcard, event_) {
-    return
-    {
-        isSelected,
-            previousCard,
-            currentCard,
-            CurrentEvent
-    };
-}
 /*
 The Class that will be the "working" memory of Botion web application
 
@@ -384,29 +444,35 @@ let updateHandler = function (data_) {
 /*Over here check to see if any of the cards have changed, 
 or have been selected etc. */
 /*
-    There is a few ways I can go at this. 
+ Every simple thing I have here, since I already have the card manager, I have a piece of logic, that 
+ will stay consistent when my event system. I'll use the managers to decouple event logic, set the cards to 
+ isSelected, then allow the keyboard to input characters into the selected card.
 
-    I can have everything decoupled and have the cards take control of there functionality. So when I enter this 
-    dashboard updateHandler function I am updating the cards according to there update function.
+ The way this works, is that, the update will constantly loop over itself updating. The data temporary variable will 
+ be constantly changing in updating itself, but will actually in the individual steps of the update, from time to time
+ will read and write information during a singular step that will create certain functionality. 
 
-    Or I can create a dashboard class, that only handles variables of which card is currently being edited, changing, 
-    etc, etc. But doesn't really manipulate anything, it really is just an interfact for managing the editing and manipualtion of the cards.
-
-    The problem that I have right now, is that I am not able to link the selected card that is avaliable for typing.
-
-    I can "Store" event data, by finally passing it off to a place that I can store. That being the dash board. 
-
-    The dash board's update function could also take an card parameter. So that you can have speific card update functionality for each card.
+ so this dashBoardUpdathandler function will update the state of a card from time to time, and will also 
+ input the text into the card listening from the keyboard handler, but it will never do both at the same time.
 */
 let dashBoardUpdateHandler = function (data_) {
-    const card = data_.card_;
-    const event = data_.event;
-    //Check if new card has been selected
+    const card = data_.data.card_;
+    const event = data_.data.event;
+    const string = data_.data.text;
+    //check to see if all the data is valid up to the card itself.
     if (data_ != undefined) {
-        if (data_.card != undefined) {
-
+        if (card != undefined) {
+            if (event != undefined) {
+                card.setState("selected");
+            }
         }
-        //Once you are able to determine the logic above, you can start creating your own functionality.
+        //check to see if the data objects has any text from 
+        //the keyboard listener
+        if(string!=undefined)
+        {
+            console.log("Keyboard input:"+data_.data.text);
+            mediator.send(data_.data.text,"Mediator","CardManager");
+        }
 
     }
 
@@ -415,8 +481,6 @@ let dashBoardUpdateHandler = function (data_) {
 document.addEventListener("update", function (data_) {
 
     console.log("update");
-
-    console.log(data_)
     // In here you can section of multiple different updates for mutliple different update features.
     dashBoardUpdateHandler(data_);
 });
@@ -439,13 +503,25 @@ Now I am going to have to add spacing features.
 Check if input is valid then concate the string.
 */
 
+
+/* 
+    This is what you can do, if you have a card that has been selected, 
+    and the there is input from the keyboard, then you can instantly put 
+    characters into that selected, card.
+
+*/
+
 let keyboardHandler = function (data_) {
     const character = data_.key;
     let keyboardChar;
+    const data = new BotionAppEventData(data_,null,"");
+    data.text=character;
     if (character != undefined) {
         switch (data_.key) {
             //This will be remove in the near future this is simply just 
             //how I am building this new feature.
+            //Since I am only sending the the keycodes and not changing the data, of the card here 
+            // I might have to make it so that the cards, update themselves.
             case "Enter":
                 {
 
@@ -469,11 +545,10 @@ let keyboardHandler = function (data_) {
             default:
                 {
                     break;
-
                 }
         }
     }
-    update_Application(null);
+    update_Application(data);
 }
 document.addEventListener("keyup", (event) => {
     keyboardpress_up(event);
@@ -505,13 +580,8 @@ addHabitButton.addEventListener("mouseover", (event) => {
 })
 
 let cardHasBeenSelectedHandler_click = function (data_) {
-    const data = new BotionAppEventData(data_.event, data_.card, '');
-    data.currentCard.isSelected = true;
-
-
-
-
-    update_Application(data);
+    console.log(data_.currentCard);
+    update_Application(data_);
 }
 /*
     Handlers can do alot, don't try to containerize everything there is 
@@ -530,7 +600,8 @@ let addCardButtonHandler_up = function (event) {
 
     //I have to pass the card into this handler
     newCard.htmlref.addEventListener("click", (event) => {
-        const data = { card: newCard.htmlref, event: event }
+        const data = new BotionAppEventData(event, newCard.htmlref, "selected");
+        newCard.eventData = data;
         cardHasBeenSelected(data);
     }
     )
@@ -578,7 +649,7 @@ addHabitButton.addEventListener("mouseleave", (event) => {
 //Instantiate styleMang
 //Instantiate DashBoard
 const botionMem = new BotionMemory();
-const meditor = new BotionMediator();
+const mediator = new Mediator();
 const cardMang = new CardManager();
 const styleMang = new StyleManager();
 const dashBoardMang = new DashBoardManager();
@@ -594,39 +665,39 @@ const DashBoardNode = document.getElementById("dash");
  there events, what they do.
 */
 function update_Application(data_) {
-    meditor.dispatch("applicationUpdate", data_);
+    mediator.dispatch("applicationUpdate", data_);
 }
 
 function keyboardpress_up(data_) {
-    meditor.dispatch("keyboardup", data_);
+    mediator.dispatch("keyboardup", data_);
 }
 
 function addNewCard(data_) {
-    meditor.dispatch("addnewcard", data_);
+    mediator.dispatch("addnewcard", data_);
 }
 
 function cardHasBeenSelected(data_) {
-    meditor.dispatch("cardhasbeenselected", data_);
+    mediator.dispatch("cardhasbeenselected", data_);
 }
 
 function addButtonHoverInfo(data_) {
-    meditor.dispatch("addbuttonhoverinfo_leave", data_);
+    mediator.dispatch("addbuttonhoverinfo_leave", data_);
 }
 
 function dashBoard_Update(data_) {
-    meditor.dispatch("dashboardupdate".data_);
+    mediator.dispatch("dashboardupdate".data_);
 }
 
 
 /* Custom Event enabling */
-meditor.enable("applicationUpdate", updateHandler);
-meditor.enable("keyboardup", keyboardHandler);
+mediator.enable("applicationUpdate", updateHandler);
+mediator.enable("keyboardup", keyboardHandler);
 
-meditor.enable("addnewcard", addCardButtonHandler_up);
-meditor.enable("cardhasbeenselected", cardHasBeenSelectedHandler_click);
+mediator.enable("addnewcard", addCardButtonHandler_up);
+mediator.enable("cardhasbeenselected", cardHasBeenSelectedHandler_click);
 
-meditor.enable("addbuttonhoverinfo_leave", addButtonHoverInfoHandler_leave);
-meditor.enable("dashboardupdate", dashBoardUpdateHandler);
+mediator.enable("addbuttonhoverinfo_leave", addButtonHoverInfoHandler_leave);
+mediator.enable("dashboardupdate", dashBoardUpdateHandler);
 
 
 
@@ -640,10 +711,11 @@ This will probably be the shortest part of my code base.
 
 function intialize() {
 
-    meditor.register("BotionMemory", botionMem.get_Component);
-    meditor.register("CardManager", cardMang.get_Component);
-    meditor.register("StyleManager", styleMang.get_Component);
-    meditor.register("dashboardManager", DashBoardManager.get_Component);
+    mediator.register("BotionMemory", botionMem.get_Component);
+    mediator.register("CardManager", cardMang.get_Component);
+    mediator.register("StyleManager", styleMang.get_Component);
+    mediator.register("dashboardManager", dashBoardMang.get_Component);
+    mediator.register("Mediator", mediator.get_component);
 
     document.head.appendChild(styleMang.get_Style);
 

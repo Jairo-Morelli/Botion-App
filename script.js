@@ -9,13 +9,80 @@
 const applicationUpdate = new CustomEvent("update", {
     detail: { message: 'this is my update event for my botion application' },
     bubbles: true,
-    cancelable: true
+    cancelable: true,
+    data: []
 }
 );
-
 /*Class delecrations*/
-/*Mediator design pattern used for 
+class DashBoardManager {
+    constructor() {
+        if (DashBoardManager.instance) {
+            console.error("Already existing instance of dashboard Manager");
+        }
+        DashBoardManager.instance = this;
+        this.#components = new Component("dashBoardManager");
+        this.#components.updateComponent = this.update_Component;
+    }
 
+    static getInstance() {
+        if (!this.instance) {
+            DashBoardManager.instance = new DashBoardManager();
+        }
+        return DashBoardManager.instance;
+    }
+
+    update_Component(message) {
+
+    }
+
+    /*getters*/
+    get get_Component() {
+        return this.#components;
+    }
+    static instance;
+    #components;
+    currentCard;
+}
+
+
+class BotionAppEventData {
+    constructor(eventType_, currentCard_, detail_) {
+        this.eventType = eventType_;
+        this.currentCard = currentCard_;
+        this.detail = detail_;
+    }
+}
+
+//Probably not going to use this LOL. Over kill for this assignment
+/* The Botion app object can be in one of several different states: 
+Updating, Reading, Writing, etc. The Botion app object, will change its state 
+depending on the request its receives, probably in most cases from the mediator.*/
+class Botionapp {
+
+    /*The Context defines the interface of interest to clients. It also maintains 
+    a reference to an instance of a State subclass, which represents the current 
+    state of the Context. */
+    Context(state_) {
+
+    }
+
+    TransitionTo(state_) {
+
+    }
+
+    /*
+    * The Context delegates part of its behaviour to the current State object. 
+    */
+
+
+    set state(state_) {
+        this.#state = state_;
+    }
+    #state;
+}
+
+
+/*Mediator design pattern used for 
 Define an objec that encapsualtes how a set of objects interact. Mediator promotes
 loose coupling by keeeping objects from referring to each other explicitly, and it lets you 
 vary their interaction indepedently. 
@@ -113,6 +180,7 @@ class Card {
     - Card Manager should edit cards 
 
     Card manager DOES NOT CARRY STATE OF CARDS.
+    Card manager can change state, BUT DOES NOT CARRY STATE OF CARDS.
 */
 class CardManager {
     constructor() {
@@ -160,7 +228,7 @@ class CardManager {
         return card_;
     }
 
-    
+
 
     static instance;
     #component;
@@ -203,7 +271,7 @@ class StyleManager {
             "this" does not refer to, the styleManager instance, "this" refers to actually 
             whatever manager or component is calling it.
         */
-   
+
         /*be careful when usings strings to build stuff. */
         const styleTemplate = `#${message.getAttribute("id")}.Card.Component { width:140px; height:140px; padding:10px;background-color:#669171; overflow-wrap:anywhere; border: 2.5px solid #0c0d0c; opacity:0.5;` +
             '}' +
@@ -233,7 +301,7 @@ class StyleManager {
     this variable will carry the "state" of my application.
 
     Factory function
-*/ 
+*/
 function createBotionData(isSelected, prevcard, currentcard, event_) {
     return
     {
@@ -307,26 +375,50 @@ class BotionMemory {
  system here, where in all other event handlers it is 100% my custom 
  code.
 */
-let updateHandler = function (event) {
+let updateHandler = function (data_) {
+    applicationUpdate.data = data_;
     document.dispatchEvent(applicationUpdate);
 
 }
 
 /*Over here check to see if any of the cards have changed, 
 or have been selected etc. */
+/*
+    There is a few ways I can go at this. 
+
+    I can have everything decoupled and have the cards take control of there functionality. So when I enter this 
+    dashboard updateHandler function I am updating the cards according to there update function.
+
+    Or I can create a dashboard class, that only handles variables of which card is currently being edited, changing, 
+    etc, etc. But doesn't really manipulate anything, it really is just an interfact for managing the editing and manipualtion of the cards.
+
+    The problem that I have right now, is that I am not able to link the selected card that is avaliable for typing.
+
+    I can "Store" event data, by finally passing it off to a place that I can store. That being the dash board. 
+
+    The dash board's update function could also take an card parameter. So that you can have speific card update functionality for each card.
+*/
 let dashBoardUpdateHandler = function (data_) {
     const card = data_.card_;
     const event = data_.event;
-    //Check if new card has been selected, and compare that to previous card  
+    //Check if new card has been selected
+    if (data_ != undefined) {
+        if (data_.card != undefined) {
 
-    //Once you are able to determine the logic above, you can start creating your own functionality.
+        }
+        //Once you are able to determine the logic above, you can start creating your own functionality.
+
+    }
+
 }
 /*Application update */
-document.addEventListener("update", function (data) {
+document.addEventListener("update", function (data_) {
 
     console.log("update");
 
-    dashBoardUpdateHandler(data);
+    console.log(data_)
+    // In here you can section of multiple different updates for mutliple different update features.
+    dashBoardUpdateHandler(data_);
 });
 
 /*functions */
@@ -356,9 +448,7 @@ let keyboardHandler = function (data_) {
             //how I am building this new feature.
             case "Enter":
                 {
-                    BotionJSON.cardData[0].text = keyboardChar;
-                    console.log(BotionJSON);
-                    console.log(BotionJSON.cardData[0].text);
+
                     break;
                 }
             case "Tab":
@@ -378,7 +468,6 @@ let keyboardHandler = function (data_) {
                 }
             default:
                 {
-                    keyboardChar += character;
                     break;
 
                 }
@@ -416,14 +505,13 @@ addHabitButton.addEventListener("mouseover", (event) => {
 })
 
 let cardHasBeenSelectedHandler_click = function (data_) {
-    const event = data_.event;
-    const card = data_.card;
+    const data = new BotionAppEventData(data_.event, data_.card, '');
+    data.currentCard.isSelected = true;
 
-    card.isSelected = true;
 
-    console.log(card);
 
-    update_Application(null);
+
+    update_Application(data);
 }
 /*
     Handlers can do alot, don't try to containerize everything there is 
@@ -442,7 +530,7 @@ let addCardButtonHandler_up = function (event) {
 
     //I have to pass the card into this handler
     newCard.htmlref.addEventListener("click", (event) => {
-        const data = {card: newCard.htmlref, event: event}
+        const data = { card: newCard.htmlref, event: event }
         cardHasBeenSelected(data);
     }
     )
@@ -493,7 +581,9 @@ const botionMem = new BotionMemory();
 const meditor = new BotionMediator();
 const cardMang = new CardManager();
 const styleMang = new StyleManager();
+const dashBoardMang = new DashBoardManager();
 const DashBoardNode = document.getElementById("dash");
+
 
 /*Global variables */
 
@@ -515,9 +605,8 @@ function addNewCard(data_) {
     meditor.dispatch("addnewcard", data_);
 }
 
-function cardHasBeenSelected(data_)
-{
-    meditor.dispatch("cardhasbeenselected",data_);
+function cardHasBeenSelected(data_) {
+    meditor.dispatch("cardhasbeenselected", data_);
 }
 
 function addButtonHoverInfo(data_) {
@@ -554,6 +643,7 @@ function intialize() {
     meditor.register("BotionMemory", botionMem.get_Component);
     meditor.register("CardManager", cardMang.get_Component);
     meditor.register("StyleManager", styleMang.get_Component);
+    meditor.register("dashboardManager", DashBoardManager.get_Component);
 
     document.head.appendChild(styleMang.get_Style);
 

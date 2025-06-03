@@ -4,7 +4,7 @@
  * License: Do not copy or redistribute without permission.
  */
 
-/*Functionality/Defintion Code */
+/*Custom Javascript event code*/
 
 const applicationUpdate = new CustomEvent("update", {
     detail: { message: 'this is my update event for my botion application' },
@@ -13,6 +13,17 @@ const applicationUpdate = new CustomEvent("update", {
     data: []
 }
 );
+
+const applicationSave = new CustomEvent("save", {
+    detail: { message: "save event" },
+    bubbles: true,
+    cancelable: true,
+    data: []
+})
+
+/*Custom Javascript events code*/
+
+
 /*Class delecrations*/
 //probably not going to use this.
 class DashBoardManager {
@@ -57,56 +68,15 @@ class DashBoardManager {
     #eventData;
 }
 
-/*
-    BotionAppEventData also controls 
-    application state. 
-
-    this class will do alot of the heavy lifting. Of my application functionality.
-
-    The reason this works so well, is that I can have mutliple different types of state for different objects, 
-    and have there functionality be change literally because of a string. 
-
-    And funnily enough, it is still loosely coupled to the application.
-
-    No need for a state class.
-*/
 class BotionAppEventData {
     constructor(eventType_, currentCard_, state_) {
         this.eventType = eventType_;
         this.currentCard = currentCard_;
         this.state = state_;
-        this.text="";
+        this.text = "";
     }
 }
 
-//Probably not going to use this LOL. Over kill for this assignment
-//Probably still not going to use this, but I am using it as an example.
-/* The Botion app object can be in one of several different states: 
-Updating, Reading, Writing, etc. The Botion app object, will change its state 
-depending on the request its receives, probably in most cases from the mediator.*/
-class Botionapp {
-
-    /*The Context defines the interface of interest to clients. It also maintains 
-    a reference to an instance of a State subclass, which represents the current 
-    state of the Context. */
-    Context(state_) {
-
-    }
-
-    TransitionTo(state_) {
-
-    }
-
-    /*
-    * The Context delegates part of its behaviour to the current State object. 
-    */
-
-
-    set state(state_) {
-        this.#state = state_;
-    }
-    #state;
-}
 
 
 /*Mediator design pattern used for 
@@ -118,7 +88,7 @@ class Mediator {
     constructor() {
         this.components = {};
         this.events = {};
-        this.component= new Component("Mediator");
+        this.component = new Component("Mediator");
         this.component.setMediator(this);
     }
     // function to communicate with application components
@@ -156,10 +126,9 @@ class Mediator {
         this.events[eventName].forEach(fn => fn(data));
         console.log(eventName);
     }
-    
+
     /*Getters*/
-    get get_component()
-    {
+    get get_component() {
         return this.component;
     }
     component;
@@ -206,9 +175,13 @@ class Card {
         this.cardText = "";
     }
 
-    set text(text_)
-    {
-        this.#cardText=text_;
+    /* 
+    Because each card is different I am going to create a function 
+    that sets the component of each card according to the card's id.  
+     */
+
+    set text(text_) {
+        this.#cardText = text_;
     }
 
     setState(newState_) {
@@ -220,6 +193,15 @@ class Card {
                     this.isSelected = false;
                     break;
                 }
+            /* Telling the card to have a state of selected is easy, 
+            but what about de-selecting a card? Pretty simply, just do, in your 
+            event system. If card has been previously selected, de-select it. 
+            
+            How can I deselect something I don't have a reference to?
+            
+            You can check state in your managers, updates. 
+            
+            This particular scenario is like*/
             case "selected":
                 {
                     this.isSelected = true;
@@ -238,6 +220,7 @@ class Card {
     id;
     #state;
     #cardText;
+    #component;
 }
 
 /*Card Manager Class 
@@ -245,6 +228,8 @@ class Card {
     - Card Manager should create classes like a factory class 
     - Card Manager should delete cards 
     - Card Manager should edit cards 
+    - Card Manager can shuffle cards 
+    - Card can track correct and incorrect answers 
 
     Card manager DOES NOT CARRY STATE OF CARDS.
     Card manager can change state, BUT DOES NOT CARRY STATE OF CARDS.
@@ -270,14 +255,17 @@ class CardManager {
     updateCards() {
 
     }
-    /*Concrete component functionality */
+  
     update_Component(message) {
 
-        //console.log(message);
+            switch(state)
+            {
+
+            }
+        console.log(message);
 
     }
 
-    /*getters*/
     get get_Component() {
         return this.#component;
     }
@@ -296,12 +284,9 @@ class CardManager {
         return card_;
     }
 
-    RemoveCard(card_)
-    {
+    RemoveCard(card_) {
 
     }
-
-
 
     static instance;
     #component;
@@ -347,6 +332,7 @@ class StyleManager {
         */
 
         /*be careful when usings strings to build stuff. */
+
         const styleTemplate = `#${message.getAttribute("id")}.Card.Component { width:140px; height:140px; padding:10px;background-color:#669171; overflow-wrap:anywhere; border: 2.5px solid #0c0d0c; opacity:0.5;` +
             '}' +
             `#${message.getAttribute("id")}.Card.Component p {opacity:0.3; font-size:12px; text-align:center;}`;
@@ -383,13 +369,40 @@ class BotionMemory {
             console.error("Already existing instance of BotionMemory Object");
         }
         BotionMemory.instance = this;
-        this.#component = new Component("BotionApp")
+        this.#component = new Component("botionMemory");
         this.#component.updateComponent = this.update_Component;
     }
 
 
     /*Concrete component functionality */
     update_Component(message) {
+
+        /* Okay so this is what I've been planning to do with my application and how 
+        it works mainly with the updates. 
+        
+        Okay so I have my standard updates right? 
+        basically whenever they are running through my event system, you could in a way 
+        consider them global, the way that they update things will be completely  
+        update entire parts of my application without any conditional and switch case 
+        functionality, mainly because that would actually confuse me and make the code a 
+        mess. 
+
+
+        So the great thing about my update_Component functions, is that I am able to 
+        write specific update code, for certain objects that is loosely coupled to the program. 
+        
+        my more universal updates are, loosely coupled as well. But they are connect to the 
+        browsers event system. My update_component functions aren't. 
+
+        The most important thing about my update_component functions, is that I am able 
+        to give them particular states or straight up condtional branching within them. 
+
+        allowing me to give each object, VERY, VERY SPECIFIC UPDATE code, for my very 
+        specific object/class. 
+
+        loose when called, but specific when executed. 
+        */
+
 
     }
 
@@ -427,34 +440,30 @@ class BotionMemory {
     #component;
 }
 
+/* Event Handler */
 
-/*Event Listeners*/
-
-/*This is probably a little bit confusing 
- I am using javascripts built-in functionality for a an event 
- system here, where in all other event handlers it is 100% my custom 
- code.
-*/
 let updateHandler = function (data_) {
     applicationUpdate.data = data_;
     document.dispatchEvent(applicationUpdate);
 
 }
-
-/*Over here check to see if any of the cards have changed, 
-or have been selected etc. */
 /*
- Every simple thing I have here, since I already have the card manager, I have a piece of logic, that 
- will stay consistent when my event system. I'll use the managers to decouple event logic, set the cards to 
- isSelected, then allow the keyboard to input characters into the selected card.
+ use mediator to send message to all objects that require a save? 
 
- The way this works, is that, the update will constantly loop over itself updating. The data temporary variable will 
- be constantly changing in updating itself, but will actually in the individual steps of the update, from time to time
- will read and write information during a singular step that will create certain functionality. 
-
- so this dashBoardUpdathandler function will update the state of a card from time to time, and will also 
- input the text into the card listening from the keyboard handler, but it will never do both at the same time.
+ this function will call botionMemory, to save all the information of all 
+ the managers, because all the managers contain the information of all the 
+ data types that I want to save to local storage.
 */
+let applicationSaveHandler = function (data_) {
+    console.log("Saved botion");
+
+}
+
+let applicationWriterHandler = function (data_) {
+    console.log("write");
+}
+
+
 let dashBoardUpdateHandler = function (data_) {
     const card = data_.data.card_;
     const event = data_.data.event;
@@ -468,54 +477,33 @@ let dashBoardUpdateHandler = function (data_) {
         }
         //check to see if the data objects has any text from 
         //the keyboard listener
-        if(string!=undefined)
-        {
-            console.log("Keyboard input:"+data_.data.text);
-            mediator.send(data_.data.text,"Mediator","CardManager");
+        if (string != undefined) {
+            console.log("Keyboard input:" + data_.data.text);
+            mediator.send(data_.data, "Mediator", "CardManager");
         }
 
     }
 
 }
-/*Application update */
+
 document.addEventListener("update", function (data_) {
 
     console.log("update");
     // In here you can section of multiple different updates for mutliple different update features.
     dashBoardUpdateHandler(data_);
+
 });
 
-/*functions */
 
-/*
- 5-15-2025 Feature 
- 
- Making it so that my cards are able to have text information. 
+document.addEventListener("applicationSave", function (data_) {
 
- The thing that I am testing, is to see if I am able to properly fill my JSON 
- cards with the right keyboard information. 
-
- If I can fill my JSON objects with the right information then I am able to make it so 
-that my web application is able to say the information that my users write into it.
-
-Now I am going to have to add spacing features. 
-
-Check if input is valid then concate the string.
-*/
-
-
-/* 
-    This is what you can do, if you have a card that has been selected, 
-    and the there is input from the keyboard, then you can instantly put 
-    characters into that selected, card.
-
-*/
+})
 
 let keyboardHandler = function (data_) {
     const character = data_.key;
     let keyboardChar;
-    const data = new BotionAppEventData(data_,null,"");
-    data.text=character;
+    const data = new BotionAppEventData(data_, null, "");
+    data.text = character;
     if (character != undefined) {
         switch (data_.key) {
             //This will be remove in the near future this is simply just 
@@ -560,18 +548,7 @@ let habitButtonH_over = function (event) {
     //Access div container through .html .css attribute
     const addDivElements = document.getElementsByClassName("Btn");
 
-    /*This is some pretty hard coded code right here. I am 
-    taking the approach that if I already know the div structure, 
-    therefore I will always be able to accessing my add div structure
-    and then access my addHoverInfo text.
- 
-    This doesn't feel right, but this is the design choice I am making.
-    */
     const addHoverInfo = addDivElements[0].children[0];
-
-    //First way I decided to do it
-    //addHoverInfo.style.visibility="visible";
-    //I perfer working with numbers.
     addHoverInfo.style.opacity = 1.0;
     update_Application(null);
 }
@@ -580,17 +557,8 @@ addHabitButton.addEventListener("mouseover", (event) => {
 })
 
 let cardHasBeenSelectedHandler_click = function (data_) {
-    console.log(data_.currentCard);
     update_Application(data_);
 }
-/*
-    Handlers can do alot, don't try to containerize everything there is 
-    literally no need.
-    this is a handler, that uses another handler. 
-
-    You have it setup so the handlers are loosely coupled with the 
-    Botion application.
- */
 
 let addCardButtonHandler_up = function (event) {
     let newCard = new Card();
@@ -624,46 +592,30 @@ let addButtonHoverInfoHandler_leave = function (data_) {
 
     update_Application(null);
 }
-/*
-    Where I place my BotionApplication data structure. Sure 
-    it is more tightly coupled now but, you can always pass a null 
-    BotionApplication data structure and the event system will still 
-    work.
 
-    if the BotionApplication data gets to big you're going to have to use a 
-    different design pattern. For now this is fine.
- */
 addHabitButton.addEventListener("mouseleave", (event) => {
     const botionAppData = createBotionData(false, false, false, event);
 
     addButtonHoverInfo(botionAppData);
 })
 
-/*Functionality/Defintion Code*/
+/*Event Listeners*/
 
 /*Global variables */
-
 //Instantiate Botion Mem
 //Instantiate BotionMediator 
 //Instantiate CardMang
 //Instantiate styleMang
-//Instantiate DashBoard
 const botionMem = new BotionMemory();
 const mediator = new Mediator();
 const cardMang = new CardManager();
 const styleMang = new StyleManager();
 const dashBoardMang = new DashBoardManager();
 const DashBoardNode = document.getElementById("dash");
-
-
 /*Global variables */
 
+/*Mediator Custom Event defintions */
 
-/* Custom Event defintions */
-/* 
- Naming conventions for the events should be 
- there events, what they do.
-*/
 function update_Application(data_) {
     mediator.dispatch("applicationUpdate", data_);
 }
@@ -685,11 +637,19 @@ function addButtonHoverInfo(data_) {
 }
 
 function dashBoard_Update(data_) {
-    mediator.dispatch("dashboardupdate".data_);
+    mediator.dispatch("dashboardupdate", data_);
 }
 
+function botionapp_Save(data_) {
+    mediator.dispatch("save", data_);
+}
 
-/* Custom Event enabling */
+function botionapp_writer(data_) {
+    mediator.dispatch("write", data_);
+}
+/*Mediator Custom Event defintions */
+
+/* Mediator Custom Event enabling */
 mediator.enable("applicationUpdate", updateHandler);
 mediator.enable("keyboardup", keyboardHandler);
 
@@ -699,15 +659,12 @@ mediator.enable("cardhasbeenselected", cardHasBeenSelectedHandler_click);
 mediator.enable("addbuttonhoverinfo_leave", addButtonHoverInfoHandler_leave);
 mediator.enable("dashboardupdate", dashBoardUpdateHandler);
 
+mediator.enable("save", applicationSaveHandler);
+mediator.enable("write", applicationWriterHandler);
+/* Mediator Custom Event enabling */
 
 
 /*Application Code  */
-/* 
- The way it works now is that I intialize my application 
- and my application is jumping all over the place, because of the event system.
-
-This will probably be the shortest part of my code base.
-*/
 
 function intialize() {
 
@@ -716,18 +673,31 @@ function intialize() {
     mediator.register("StyleManager", styleMang.get_Component);
     mediator.register("dashboardManager", dashBoardMang.get_Component);
     mediator.register("Mediator", mediator.get_component);
+    mediator.register("botionMemory", mediator.get_component);
 
     document.head.appendChild(styleMang.get_Style);
 
 }
 
+intialize();
+update_Application();
+
+let saveInterval = setInterval(applicationSaveHandler, 150000); // Calls every 2.5 minutes, 150,000 ms = 2.5 minutes
+
 
 /*Application Code  */
 
 
+// const file = new Blob(["foo"], {type: 'text/plain'});
 
-intialize();
-update_Application();
+// // Create a temporary URL for the Blob
+// const url = URL.createObjectURL(file);
 
 
+// // Create an anchor and trigger download 
+// const a = document.createElement('a');
+// a.href = url;
+// a.download = file;
+
+// a.click();
 

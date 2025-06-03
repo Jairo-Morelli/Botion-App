@@ -4,6 +4,19 @@
  * License: Do not copy or redistribute without permission.
  */
 
+/*Custom Botionapplication JSON string code 
+    - I can parse my botionapplication data directly into 
+    BASEBOTIONJSON.botionData value directly.
+*/
+const BASEBOTIONJSON =
+    '{' +
+    '"BotionData": [' +
+    '{' +
+
+    '}' +
+    ']' +
+    '}'
+
 /*Custom Javascript event code*/
 
 const applicationUpdate = new CustomEvent("update", {
@@ -24,50 +37,6 @@ const applicationSave = new CustomEvent("save", {
 /*Custom Javascript events code*/
 
 
-/*Class delecrations*/
-//probably not going to use this.
-class DashBoardManager {
-    constructor() {
-        if (DashBoardManager.instance) {
-            console.error("Already existing instance of dashboard Manager");
-        }
-        DashBoardManager.instance = this;
-        this.#components = new Component("dashBoardManager");
-        this.#components.updateComponent = this.update_Component;
-        this.#mediator = new Mediator();
-    }
-
-    static getInstance() {
-        if (!this.instance) {
-            DashBoardManager.instance = new DashBoardManager();
-        }
-        return DashBoardManager.instance;
-    }
-    /* 
-    I don't need this, actually for updating my Botion application. Which is funny. 
-    The way I have my update functions for my application loop, is exactly extremely loosely coupled, 
-    in relation to actual class/object. I can maintain this lose coupling because the way, my update functions 
-    actually run is through my event system. It isn't really linked to any of my specific calls.
-    */
-    update_Component(message) {
-
-    }
-
-    /*getters*/
-    get get_Component() {
-        return this.#components;
-    }
-
-    /*setters*/
-    set set_BotionAppEventData(data_) {
-        this.#eventData = data_;
-    }
-    static instance;
-    #components;
-    #mediator;
-    #eventData;
-}
-
 class BotionAppEventData {
     constructor(eventType_, currentCard_, state_) {
         this.eventType = eventType_;
@@ -77,7 +46,19 @@ class BotionAppEventData {
     }
 }
 
+/* Serializer */
+class BotionSerializer {
+   constructor()
+   {
+    this.#botionJSON= JSON.parse(BASEBOTIONJSON);
+   }
 
+   get botionJSON()
+   {
+    return this.#botionJSON;
+   }
+   #botionJSON;
+}
 
 /*Mediator design pattern used for 
 Define an objec that encapsualtes how a set of objects interact. Mediator promotes
@@ -255,13 +236,12 @@ class CardManager {
     updateCards() {
 
     }
-  
+
     update_Component(message) {
 
-            switch(state)
-            {
+        switch (state) {
 
-            }
+        }
         console.log(message);
 
     }
@@ -276,12 +256,17 @@ class CardManager {
 
 
     createCard(card_) {
+
+        const newCard = new Card()
         card_ = document.createElement("div");
         card_.setAttribute("class", "Card Component");
         card_.setAttribute("id", "card-" + (this.#cardsArray.length + 1)); //ID's will always start at 1.
         this.#component.send(card_, "StyleManager");
-        this.#cardsArray.push(card_);
-        return card_;
+
+        newCard.htmlref = card_;
+
+        this.#cardsArray.push(newCard);
+        return newCard;
     }
 
     RemoveCard(card_) {
@@ -371,12 +356,13 @@ class BotionMemory {
         BotionMemory.instance = this;
         this.#component = new Component("botionMemory");
         this.#component.updateComponent = this.update_Component;
+        this.#botionJSON = JSON.parse(BASEBOTIONJSON);
     }
 
 
     /*Concrete component functionality */
     update_Component(message) {
-
+        const botionInstanceRef = BotionMemory.getInstance();
         /* Okay so this is what I've been planning to do with my application and how 
         it works mainly with the updates. 
         
@@ -402,8 +388,31 @@ class BotionMemory {
 
         loose when called, but specific when executed. 
         */
+        switch (message.state) {
+            case "WRITE":
+                {
+                    const jsonRef = botionInstanceRef.get_BotionJSON;
+                    const turntoString = JSON.stringify(CardManager.getInstance().get_cardsArray);
+                    console.log(turntoString);
+                    console.log(CardManager.getInstance().get_cardsArray);
+                    console.log(jsonRef);
+                    // jsonRef.parse(CardManager.getInstance().get_cardsArray);
+                    // jsonRef.parse(StyleManager.getInstance());
+                    // botionInstanceRef.get_BotionJSON.BotionData.parse(StyleManager.getInstance());
 
 
+                    console.log(this.#botionJSON);
+                    break;
+                }
+            case "READ":
+                {
+                    break;
+                }
+            default:
+                {
+                    break;
+                }
+        }
     }
 
     static getInstance() {
@@ -417,17 +426,11 @@ class BotionMemory {
         this.#botionJSON.concat(data_);
     }
 
-    set Dashboard_JSON(data_) {
-        this.#dashboardJSON.concat(data_);
-    }
     /*getters*/
-    get get_Botion_JSON() {
+    get get_BotionJSON() {
         return this.#botionJSON;
     }
 
-    get get_DashBoard_JSON() {
-        return this.#dashboardJSON;
-    }
 
     get get_Component() {
         return this.#component;
@@ -436,7 +439,6 @@ class BotionMemory {
     static instance;
     //Private variables
     #botionJSON;
-    #dashboardJSON;
     #component;
 }
 
@@ -453,14 +455,19 @@ let updateHandler = function (data_) {
  this function will call botionMemory, to save all the information of all 
  the managers, because all the managers contain the information of all the 
  data types that I want to save to local storage.
-*/
-let applicationSaveHandler = function (data_) {
-    console.log("Saved botion");
 
+ call botionMemory.update_Component using the mediator
+*/
+let applicationWriteHandler = function (data_) {
+    data_ = new BotionAppEventData(null, null, "WRITE");
+    console.log(data_.state);
+    // mediator.get_component.send(data_, "botionMemory");
+    mediator.send(data_, "Mediator", "BotionMemory");
 }
 
-let applicationWriterHandler = function (data_) {
-    console.log("write");
+let applicationReadHandler = function (data_) {
+    console.log("read");
+
 }
 
 
@@ -562,7 +569,7 @@ let cardHasBeenSelectedHandler_click = function (data_) {
 
 let addCardButtonHandler_up = function (event) {
     let newCard = new Card();
-    newCard.htmlref = cardMang.createCard(newCard.htmlref);
+    newCard = cardMang.createCard(newCard);
 
     DashBoardNode.append(newCard.htmlref);
 
@@ -610,7 +617,6 @@ const botionMem = new BotionMemory();
 const mediator = new Mediator();
 const cardMang = new CardManager();
 const styleMang = new StyleManager();
-const dashBoardMang = new DashBoardManager();
 const DashBoardNode = document.getElementById("dash");
 /*Global variables */
 
@@ -640,12 +646,12 @@ function dashBoard_Update(data_) {
     mediator.dispatch("dashboardupdate", data_);
 }
 
-function botionapp_Save(data_) {
+function botionapp_Writer(data_) {
     mediator.dispatch("save", data_);
 }
 
-function botionapp_writer(data_) {
-    mediator.dispatch("write", data_);
+function botionapp_Reader(data_) {
+    mediator.dispatch("read", data_);
 }
 /*Mediator Custom Event defintions */
 
@@ -659,8 +665,8 @@ mediator.enable("cardhasbeenselected", cardHasBeenSelectedHandler_click);
 mediator.enable("addbuttonhoverinfo_leave", addButtonHoverInfoHandler_leave);
 mediator.enable("dashboardupdate", dashBoardUpdateHandler);
 
-mediator.enable("save", applicationSaveHandler);
-mediator.enable("write", applicationWriterHandler);
+mediator.enable("write", applicationWriteHandler);
+mediator.enable("read", applicationReadHandler);
 /* Mediator Custom Event enabling */
 
 
@@ -671,9 +677,7 @@ function intialize() {
     mediator.register("BotionMemory", botionMem.get_Component);
     mediator.register("CardManager", cardMang.get_Component);
     mediator.register("StyleManager", styleMang.get_Component);
-    mediator.register("dashboardManager", dashBoardMang.get_Component);
     mediator.register("Mediator", mediator.get_component);
-    mediator.register("botionMemory", mediator.get_component);
 
     document.head.appendChild(styleMang.get_Style);
 
@@ -682,22 +686,18 @@ function intialize() {
 intialize();
 update_Application();
 
-let saveInterval = setInterval(applicationSaveHandler, 150000); // Calls every 2.5 minutes, 150,000 ms = 2.5 minutes
+let saveInterval = setInterval(applicationWriteHandler, 2000); // Calls every 2.5 minutes, 150,000 ms = 2.5 minutes
 
-
+//applicationWriteHandler();
 /*Application Code  */
 
-
+//irrelavent 
 // const file = new Blob(["foo"], {type: 'text/plain'});
-
 // // Create a temporary URL for the Blob
 // const url = URL.createObjectURL(file);
-
-
 // // Create an anchor and trigger download 
 // const a = document.createElement('a');
 // a.href = url;
 // a.download = file;
-
 // a.click();
 

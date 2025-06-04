@@ -148,6 +148,7 @@ class Component {
 /*The Card class definition */
 class Card {
     constructor() {
+        this.type="Card";
         this.isSelected = false;
         this.hasChanged = false;
         this.htmlref = HTMLElement;
@@ -392,8 +393,11 @@ class BotionMemory {
             case "WRITE":
                 {
                     const jsonRef = botionInstanceRef.get_BotionJSON;
-                    const turntoString = JSON.stringify(CardManager.getInstance().get_cardsArray);
-                    console.log(turntoString);
+                    let stringtoparse = JSON.parse( JSON.stringify(CardManager.getInstance().get_cardsArray));
+                    let stringtoparsetostring = JSON.stringify(stringtoparse);
+                  //  turntoString[0]+="card";
+                    console.log(stringtoparse);
+                    console.log(stringtoparsetostring);
                     console.log(CardManager.getInstance().get_cardsArray);
                     console.log(jsonRef);
                     // jsonRef.parse(CardManager.getInstance().get_cardsArray);
@@ -401,7 +405,6 @@ class BotionMemory {
                     // botionInstanceRef.get_BotionJSON.BotionData.parse(StyleManager.getInstance());
 
 
-                    console.log(this.#botionJSON);
                     break;
                 }
             case "READ":

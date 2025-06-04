@@ -3,7 +3,14 @@
  * Description: Written May 13th 2025
  * License: Do not copy or redistribute without permission.
  */
-
+/*Custom BotionApplication Base Object */
+class baseBotionObject
+{
+    constructor(){
+        this.objType="";
+    }
+}
+/*Custom BotionApplication Base Object */
 /*Custom Botionapplication JSON string code 
     - I can parse my botionapplication data directly into 
     BASEBOTIONJSON.botionData value directly.
@@ -59,6 +66,12 @@ class BotionSerializer {
    }
    #botionJSON;
 }
+
+
+/*
+    Making BotionSerializer a child class of Botion
+*/
+Object.setPrototypeOf(BotionSerializer.prototype, baseBotionObject.prototype);
 
 /*Mediator design pattern used for 
 Define an objec that encapsualtes how a set of objects interact. Mediator promotes
@@ -117,6 +130,9 @@ class Mediator {
     events;
 }
 
+Object.setPrototypeOf(Mediator.prototype, baseBotionObject.prototype);
+
+
 class Component {
     constructor(name) {
         this.name = name;
@@ -139,6 +155,8 @@ class Component {
     }
     updateComponent = function (message) { };
 }
+
+Object.setPrototypeOf(Component.prototype, baseBotionObject.prototype);
 
 /*Cards potential states 
  - idle
@@ -204,6 +222,7 @@ class Card {
     #cardText;
     #component;
 }
+Object.setPrototypeOf(Card.prototype, baseBotionObject.prototype);
 
 /*Card Manager Class 
     - Card Manager class should maintain collection of cards 
@@ -279,6 +298,7 @@ class CardManager {
     #cardsArray = [];
 }
 
+Object.setPrototypeOf(CardManager.prototype, baseBotionObject.prototype);
 
 /*Style Manager Class 
     - Style Manager class should maintain collection of cards 
@@ -342,6 +362,7 @@ class StyleManager {
     #component;
     #style;
 }
+Object.setPrototypeOf(StyleManager.prototype, baseBotionObject.prototype);
 
 /*
 The Class that will be the "working" memory of Botion web application
@@ -444,6 +465,7 @@ class BotionMemory {
     #botionJSON;
     #component;
 }
+Object.setPrototypeOf(BotionMemory.prototype, baseBotionObject.prototype);
 
 /* Event Handler */
 
@@ -685,6 +707,8 @@ function intialize() {
     document.head.appendChild(styleMang.get_Style);
 
 }
+
+console.log(CardManager.prototype.type);   
 
 intialize();
 update_Application();

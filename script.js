@@ -3,11 +3,40 @@
  * Description: Written May 13th 2025
  * License: Do not copy or redistribute without permission.
  */
+//Won't take credit for something that wasn't mine. 
+// but I will use it :)
+/* Taken from chatgpt */
+
+function getAllPropertyValues(obj) {
+    const result = {};
+    const seen = new Set();
+  
+    while (obj && obj !== Object.prototype) {
+      for (const prop of Object.getOwnPropertyNames(obj)) {
+        if (seen.has(prop)) continue;
+        seen.add(prop);
+  
+        try {
+          const value = obj[prop];
+          // Avoid functions if you only want data
+          if (typeof value !== 'function') {
+            result[prop] = value;
+          }
+        } catch (err) {
+          result[prop] = `[Error accessing property: ${err.message}]`;
+        }
+      }
+  
+      obj = Object.getPrototypeOf(obj);
+    }
+  
+    return result;
+  }
+
 /*Custom BotionApplication Base Object */
-class baseBotionObject
-{
-    constructor(){
-        this.objType="";
+class baseBotionObject {
+    constructor() {
+        this.objType = "";
     }
 }
 /*Custom BotionApplication Base Object */
@@ -52,19 +81,19 @@ class BotionAppEventData {
         this.text = "";
     }
 }
+//Object.setPrototypeOf(BotionAppEventData.prototype, baseBotionObject.prototype);
+//BotionAppEventData.prototype.type="BotionAppEventData";
 
 /* Serializer */
 class BotionSerializer {
-   constructor()
-   {
-    this.#botionJSON= JSON.parse(BASEBOTIONJSON);
-   }
+    constructor() {
+        this.#botionJSON = JSON.parse(BASEBOTIONJSON);
+    }
 
-   get botionJSON()
-   {
-    return this.#botionJSON;
-   }
-   #botionJSON;
+    get botionJSON() {
+        return this.#botionJSON;
+    }
+    #botionJSON;
 }
 
 
@@ -72,6 +101,7 @@ class BotionSerializer {
     Making BotionSerializer a child class of Botion
 */
 Object.setPrototypeOf(BotionSerializer.prototype, baseBotionObject.prototype);
+BotionSerializer.prototype.type = "BotionSerializer";
 
 /*Mediator design pattern used for 
 Define an objec that encapsualtes how a set of objects interact. Mediator promotes
@@ -131,6 +161,7 @@ class Mediator {
 }
 
 Object.setPrototypeOf(Mediator.prototype, baseBotionObject.prototype);
+Mediator.prototype.type = "Mediator";
 
 
 class Component {
@@ -157,6 +188,7 @@ class Component {
 }
 
 Object.setPrototypeOf(Component.prototype, baseBotionObject.prototype);
+Component.prototype.type = "Component";
 
 /*Cards potential states 
  - idle
@@ -166,7 +198,7 @@ Object.setPrototypeOf(Component.prototype, baseBotionObject.prototype);
 /*The Card class definition */
 class Card {
     constructor() {
-        this.type="Card";
+        this.type = "Card";
         this.isSelected = false;
         this.hasChanged = false;
         this.htmlref = HTMLElement;
@@ -222,7 +254,9 @@ class Card {
     #cardText;
     #component;
 }
+
 Object.setPrototypeOf(Card.prototype, baseBotionObject.prototype);
+Card.prototype.type = "Card";
 
 /*Card Manager Class 
     - Card Manager class should maintain collection of cards 
@@ -299,6 +333,7 @@ class CardManager {
 }
 
 Object.setPrototypeOf(CardManager.prototype, baseBotionObject.prototype);
+CardManager.prototype.type = "CardManager";
 
 /*Style Manager Class 
     - Style Manager class should maintain collection of cards 
@@ -363,6 +398,7 @@ class StyleManager {
     #style;
 }
 Object.setPrototypeOf(StyleManager.prototype, baseBotionObject.prototype);
+StyleManager.prototype.type = "StyleManager";
 
 /*
 The Class that will be the "working" memory of Botion web application
@@ -414,17 +450,28 @@ class BotionMemory {
             case "WRITE":
                 {
                     const jsonRef = botionInstanceRef.get_BotionJSON;
-                    let stringtoparse = JSON.parse( JSON.stringify(CardManager.getInstance().get_cardsArray));
-                    let stringtoparsetostring = JSON.stringify(stringtoparse);
-                  //  turntoString[0]+="card";
-                    console.log(stringtoparse);
-                    console.log(stringtoparsetostring);
-                    console.log(CardManager.getInstance().get_cardsArray);
-                    console.log(jsonRef);
-                    // jsonRef.parse(CardManager.getInstance().get_cardsArray);
-                    // jsonRef.parse(StyleManager.getInstance());
-                    // botionInstanceRef.get_BotionJSON.BotionData.parse(StyleManager.getInstance());
+                    let stringtoparse = JSON.parse(JSON.stringify(CardManager.getInstance().get_cardsArray));
+                    let tostring = JSON.stringify(CardManager.getInstance().get_cardsArray);
 
+                    //          console.log(stringtoparse);
+                    //          console.log(tostring);
+                    //          console.log(CardManager.getInstance().get_cardsArray[0]);
+                    //console.log(CardManager.getInstance().get_cardsArray[0]);
+                   // console.log(CardManager.getInstance().get_cardsArray[0].htmlref);
+
+                    const card0 = CardManager.getInstance().get_cardsArray[0];
+                    const divElement = document.getElementById("card-1");
+
+                    const allprops= getAllPropertyValues(divElement);
+                    console.log(allprops);
+                    console.dir(divElement);
+
+                    // console.dir(divElement);
+                    // for (let key in card0) {
+                    //     if (card0.hasOwnProperty(key)) {
+                    //         console.log(`${key}: ${card0[key]}`);
+                    //     }
+                    // }
 
                     break;
                 }
@@ -466,6 +513,7 @@ class BotionMemory {
     #component;
 }
 Object.setPrototypeOf(BotionMemory.prototype, baseBotionObject.prototype);
+BotionMemory.prototype.type = "BotionMemory";
 
 /* Event Handler */
 
@@ -708,10 +756,10 @@ function intialize() {
 
 }
 
-console.log(CardManager.prototype.type);   
 
 intialize();
 update_Application();
+
 
 let saveInterval = setInterval(applicationWriteHandler, 2000); // Calls every 2.5 minutes, 150,000 ms = 2.5 minutes
 

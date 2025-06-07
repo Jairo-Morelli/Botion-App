@@ -4,9 +4,6 @@ html{
 }
 
 
-
-
-
 .DashBoard.Component{
     display: flex;
     flex-wrap: wrap;

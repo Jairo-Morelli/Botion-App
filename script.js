@@ -71,15 +71,14 @@ const applicationSave = new CustomEvent("save", {
 
 
 class BotionAppEventData {
-    constructor(eventType_, data_, state_) {
+    constructor(eventType_, currentCard_, state_) {
         this.eventType = eventType_;
-        this.data = data_;
+        this.currentCard = currentCard_;
         this.state = state_;
         this.text = "";
     }
 }
-//Object.setPrototypeOf(BotionAppEventData.prototype, baseBotionObject.prototype);
-//BotionAppEventData.prototype.type="BotionAppEventData";
+
 
 /* Serializer */
 /* Always pass a JSON object 
@@ -358,8 +357,19 @@ class CardManager {
     update_Component(message) {
 
         switch (message.state) {
+            case "WRITETOAPP":
+                {
+                    
+                    console.log(message.currentCard);
+                    
+                    const template = document.createElement("div");
+                    template.setAttribute("class","Card Component");
+                    card_.setAttribute("id")
 
-
+                    
+                    CardManager.getInstance().get_cardsArray.push(message.currentCard);
+                    break;
+                }
         }
     }
 
@@ -372,18 +382,35 @@ class CardManager {
     }
 
     //create card from blank.
+    //Part of an event, so it makes sense for it to carry event data with it.
+    /* 
+        Just for notes here, if you wanted to be consistent with your programming 
+        BotionAppEventData should be in the eventhandler that calls createCard, 
+        not inside of it. But for the sake of speed, here we are.
+    */
     createCard(card_) {
-
+        const data = new BotionAppEventData();
         const newCard = new Card()
         card_ = document.createElement("div");
         card_.setAttribute("class", "Card Component");
         card_.setAttribute("id", "card-" + (this.#cardsArray.length + 1)); //ID's will always start at 1.
-        this.#component.send(card_, "StyleManager");
 
-        newCard.htmlref = card_;
+        //assigning all new data to BotionAppEventData.currentCard
+        //also assigning a state called ADDCSS
+        data.currentCard = card_;
+        data.state = "ADDCSS";
+
+        //send a Eventdata, sending a message that will inject css into my card.
+        this.#component.send(data, "StyleManager");
+
+        newCard.htmlref = data.currentCard;
 
         this.#cardsArray.push(newCard);
         return newCard;
+    }
+    createCardJSON(card_)
+    {
+
     }
 
     //create card from data
@@ -441,15 +468,38 @@ class StyleManager {
 
         /*be careful when usings strings to build stuff. */
 
-        const styleTemplate = `#${message.getAttribute("id")}.Card.Component { width:140px; height:140px; padding:10px;background-color:#669171; overflow-wrap:anywhere; border: 2.5px solid #0c0d0c; opacity:0.5;` +
-            '}' +
-            `#${message.getAttribute("id")}.Card.Component p {opacity:0.3; font-size:12px; text-align:center;}`;
+        switch (message.state) {
+            case "WRITE":
+                {
+                    break;
+                }
+            case "READ":
+                {
+                    break;
+                }
+            case "ADDCSS":
+                {
+                    //card right now is a div.
+                    const card = message.currentCard;
+                    const styleTemplate = `#${card.getAttribute("id")}.Card.Component { width:140px; height:140px; padding:10px;background-color:#669171; overflow-wrap:anywhere; border: 2.5px solid #0c0d0c; opacity:0.5;` +
+                        '}' +
+                        `#${card.getAttribute("id")}.Card.Component p {opacity:0.3; font-size:12px; text-align:center;}`;
 
-        const s = StyleManager.getInstance().get_Style;
+                    const s = StyleManager.getInstance().get_Style;
 
-        const sNode = document.getElementById("mod-style");
-        sNode.append(styleTemplate);
-
+                    const sNode = document.getElementById("mod-style");
+                    sNode.append(styleTemplate);
+                }
+            case "WRITETOAPP":
+                {
+                
+                    break;
+                }
+            default:
+                {
+                    return 0;
+                }
+        }
 
     }
 
@@ -520,13 +570,20 @@ class BotionMemory {
                     for (let objKey in botionDataJSON.BotionData) {
                         if (botionDataJSON.BotionData.hasOwnProperty(objKey)) {
                             const nestedObj = botionDataJSON.BotionData[objKey];
-
+                            let data = new BotionAppEventData();
 
                             console.log(`Object key: ${objKey}`);
-                            let card = objKey; 
+                            let card = nestedObj;
 
+                            /* with the objects in this loop, 
                             
+                            call there managers and pass this object information in order 
+                            to write in it.*/
 
+                            data.currentCard=card;
+                            data.state="WRITETOAPP";
+                            mediator.send(data,"BotionMemory","CardManager",data);
+                        
 
                             for (let prop in nestedObj) {
                                 if (nestedObj.hasOwnProperty(prop)) {
@@ -542,6 +599,7 @@ class BotionMemory {
                 }
             default:
                 {
+                    return 0;
                     break;
                 }
         }

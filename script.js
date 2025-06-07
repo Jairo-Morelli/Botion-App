@@ -357,11 +357,10 @@ class CardManager {
 
     update_Component(message) {
 
-        switch (state) {
+        switch (message.state) {
+
 
         }
-        console.log(message);
-
     }
 
     get get_Component() {
@@ -404,6 +403,7 @@ CardManager.prototype.type = "CardManager";
     - Style Manager should create classes like a factory class 
     - Style Manager should delete cards 
     - Style Manager should edit cards 
+    - Style Manager should be able to retrieve the card's styling information
 
     Style manager DOES NOT CARRY STATE OF CARDS.
 */
@@ -429,6 +429,7 @@ class StyleManager {
     /*Concrete component functionality */
     // Just a note here, you can add switch cases, in order to have different functionality inside your update_component function
     update_Component(message) {
+
         /*
             Just a reminder when you're calling this function 
 
@@ -444,12 +445,18 @@ class StyleManager {
 
         const s = StyleManager.getInstance().get_Style;
 
-
         const sNode = document.getElementById("mod-style");
         sNode.append(styleTemplate);
 
 
+    }
 
+    retrieve_style(i){
+        const sNode = document.getElementById("mod-style");
+        const styles = sNode.childNodes;
+
+        
+        return styles[i].data
     }
     get get_Component() {
         return this.#component;
@@ -486,52 +493,46 @@ class BotionMemory {
 
     /*Concrete component functionality */
     update_Component(message) {
-        /* Okay so this is what I've been planning to do with my application and how 
-        it works mainly with the updates. 
-        
-        Okay so I have my standard updates right? 
-        basically whenever they are running through my event system, you could in a way 
-        consider them global, the way that they update things will be completely  
-        update entire parts of my application without any conditional and switch case 
-        functionality, mainly because that would actually confuse me and make the code a 
-        mess. 
-
-
-        So the great thing about my update_Component functions, is that I am able to 
-        write specific update code, for certain objects that is loosely coupled to the program. 
-        
-        my more universal updates are, loosely coupled as well. But they are connect to the 
-        browsers event system. My update_component functions aren't. 
-
-        The most important thing about my update_component functions, is that I am able 
-        to give them particular states or straight up condtional branching within them. 
-
-        allowing me to give each object, VERY, VERY SPECIFIC UPDATE code, for my very 
-        specific object/class. 
-
-        loose when called, but specific when executed. 
+        /* There is read and write to the .JSON file and there is read nad write 
+        to the application (Botion)
         */
         switch (message.state) {
             case "WRITE":
                 {
-                    const botionref = botionSerial.get_botionJSON;
-                    const cardref = CardManager.getInstance().get_cardsArray;
-                    const cardIndividual = cardref[0];
+                    const cardsref = CardManager.getInstance().get_cardsArray;
+                    const styleref= StyleManager.getInstance();
+                    
                     // In order to save the card you want 
                     // 1. save the object type in the json 
-                    // 2. save the object html div id 
-                    // 3. save the object html div text content.
-                    console.log(message);
+                    
+                    for(let i =0; i< cardsref.length; i++)
+                    {
+                        botionSerial.insertEntry(botionSerial.get_botionJSON,`BotionData.card${i+1}`, cardsref[i]);
+                        botionSerial.insertEntry(botionSerial.get_botionJSON,`BotionData.card${i+1}.style`,styleref.retrieve_style(i));
+                    }
 
-                    botionSerial.insertEntry(botionref, `BotionData.card`, cardIndividual);
-                    console.log(JSON.stringify(botionSerial.get_botionJSON));
-                    console.log(botionSerial);
+                    const stringified = JSON.stringify(botionSerial.get_botionJSON);
 
 
+                    localStorage.setItem("BotionData",stringified);
+
+                    console.log(botionSerial.get_botionJSON);
+                    console.log(stringified);
+
+            
                     break;
                 }
             case "READ":
                 {
+                const botionData= localStorage.getItem("BotionData");
+                const botionDataJSON = JSON.parse(botionData);
+
+
+                console.log(botionDataJSON);
+
+
+                    
+
                     break;
                 }
             default:
@@ -594,8 +595,9 @@ let applicationWriteHandler = function (data_) {
 }
 
 let applicationReadHandler = function (data_) {
-    console.log("read");
-
+    data_ = new BotionAppEventData(null,null,"READ");
+    console.log(data_.state);
+    mediator.send(data_,"Mediator","BotionMemory");
 }
 
 
@@ -616,7 +618,6 @@ let dashBoardUpdateHandler = function (data_) {
             console.log("Keyboard input:" + data_.data.text);
             mediator.send(data_.data, "Mediator", "CardManager");
         }
-
     }
 
 }
@@ -735,7 +736,6 @@ addHabitButton.addEventListener("mouseleave", (event) => {
 })
 
 /*Event Listeners*/
-
 /*Global variables */
 //Instantiate Botion Mem
 //Instantiate BotionMediator 
@@ -819,7 +819,7 @@ intialize();
 update_Application();
 
 
-let saveInterval = setInterval(applicationWriteHandler, 2000); // Calls every 2.5 minutes, 150,000 ms = 2.5 minutes
+let saveInterval = setInterval(applicationReadHandler, 2000); // Calls every 2.5 minutes, 150,000 ms = 2.5 minutes
 
 //applicationWriteHandler();
 /*Application Code  */

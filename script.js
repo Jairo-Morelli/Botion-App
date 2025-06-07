@@ -71,9 +71,9 @@ const applicationSave = new CustomEvent("save", {
 
 
 class BotionAppEventData {
-    constructor(eventType_, currentCard_, state_) {
+    constructor(eventType_, data_, state_) {
         this.eventType = eventType_;
-        this.currentCard = currentCard_;
+        this.data = data_;
         this.state = state_;
         this.text = "";
     }
@@ -371,7 +371,7 @@ class CardManager {
         return this.#cardsArray;
     }
 
-
+    //create card from blank.
     createCard(card_) {
 
         const newCard = new Card()
@@ -385,6 +385,8 @@ class CardManager {
         this.#cardsArray.push(newCard);
         return newCard;
     }
+
+    //create card from data
 
     RemoveCard(card_) {
 
@@ -451,11 +453,11 @@ class StyleManager {
 
     }
 
-    retrieve_style(i){
+    retrieve_style(i) {
         const sNode = document.getElementById("mod-style");
         const styles = sNode.childNodes;
 
-        
+
         return styles[i].data
     }
     get get_Component() {
@@ -500,39 +502,42 @@ class BotionMemory {
             case "WRITE":
                 {
                     const cardsref = CardManager.getInstance().get_cardsArray;
-                    const styleref= StyleManager.getInstance();
-                    
-                    // In order to save the card you want 
-                    // 1. save the object type in the json 
-                    
-                    for(let i =0; i< cardsref.length; i++)
-                    {
-                        botionSerial.insertEntry(botionSerial.get_botionJSON,`BotionData.card${i+1}`, cardsref[i]);
-                        botionSerial.insertEntry(botionSerial.get_botionJSON,`BotionData.card${i+1}.style`,styleref.retrieve_style(i));
+                    const styleref = StyleManager.getInstance();
+
+                    for (let i = 0; i < cardsref.length; i++) {
+                        botionSerial.insertEntry(botionSerial.get_botionJSON, `BotionData.card${i + 1}`, cardsref[i]);
+                        botionSerial.insertEntry(botionSerial.get_botionJSON, `BotionData.card${i + 1}.style`, styleref.retrieve_style(i));
                     }
-
                     const stringified = JSON.stringify(botionSerial.get_botionJSON);
-
-
-                    localStorage.setItem("BotionData",stringified);
-
-                    console.log(botionSerial.get_botionJSON);
-                    console.log(stringified);
-
-            
+                    localStorage.setItem("BotionData", stringified);
                     break;
                 }
             case "READ":
                 {
-                const botionData= localStorage.getItem("BotionData");
-                const botionDataJSON = JSON.parse(botionData);
+                    const botionData = localStorage.getItem("BotionData");
+                    const botionDataJSON = JSON.parse(botionData);
+
+                    for (let objKey in botionDataJSON.BotionData) {
+                        if (botionDataJSON.BotionData.hasOwnProperty(objKey)) {
+                            const nestedObj = botionDataJSON.BotionData[objKey];
 
 
-                console.log(botionDataJSON);
+                            console.log(`Object key: ${objKey}`);
+                            let card = objKey; 
+
+                            
 
 
-                    
+                            for (let prop in nestedObj) {
+                                if (nestedObj.hasOwnProperty(prop)) {
+                                    console.log(` ${prop}: ${nestedObj[prop]}`);
+                                }
+                            }
+                        }
+                    }
 
+
+                    console.log(botionDataJSON.BotionData);
                     break;
                 }
             default:
@@ -595,9 +600,9 @@ let applicationWriteHandler = function (data_) {
 }
 
 let applicationReadHandler = function (data_) {
-    data_ = new BotionAppEventData(null,null,"READ");
+    data_ = new BotionAppEventData(null, null, "READ");
     console.log(data_.state);
-    mediator.send(data_,"Mediator","BotionMemory");
+    mediator.send(data_, "Mediator", "BotionMemory");
 }
 
 

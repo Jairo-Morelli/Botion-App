@@ -10,28 +10,28 @@
 function getAllPropertyValues(obj) {
     const result = {};
     const seen = new Set();
-  
+
     while (obj && obj !== Object.prototype) {
-      for (const prop of Object.getOwnPropertyNames(obj)) {
-        if (seen.has(prop)) continue;
-        seen.add(prop);
-  
-        try {
-          const value = obj[prop];
-          // Avoid functions if you only want data
-          if (typeof value !== 'function') {
-            result[prop] = value;
-          }
-        } catch (err) {
-          result[prop] = `[Error accessing property: ${err.message}]`;
+        for (const prop of Object.getOwnPropertyNames(obj)) {
+            if (seen.has(prop)) continue;
+            seen.add(prop);
+
+            try {
+                const value = obj[prop];
+                // Avoid functions if you only want data
+                if (typeof value !== 'function') {
+                    result[prop] = value;
+                }
+            } catch (err) {
+                result[prop] = `[Error accessing property: ${err.message}]`;
+            }
         }
-      }
-  
-      obj = Object.getPrototypeOf(obj);
+
+        obj = Object.getPrototypeOf(obj);
     }
-  
+
     return result;
-  }
+}
 
 /*Custom BotionApplication Base Object */
 class baseBotionObject {
@@ -46,12 +46,9 @@ class baseBotionObject {
 */
 const BASEBOTIONJSON =
     '{' +
-    '"BotionData": [' +
-    '{' +
-
+    '"BotionData": {' +
     '}' +
-    ']' +
-    '}'
+    '}';
 
 /*Custom Javascript event code*/
 
@@ -85,12 +82,79 @@ class BotionAppEventData {
 //BotionAppEventData.prototype.type="BotionAppEventData";
 
 /* Serializer */
+/* Always pass a JSON object 
+    no strings.
+*/
 class BotionSerializer {
     constructor() {
-        this.#botionJSON = JSON.parse(BASEBOTIONJSON);
+
     }
 
-    get botionJSON() {
+    insertEntry(obj, path, value) {
+        if (typeof path == "string") path = path.split(".");
+        if (path.length === 0) return;
+
+        const [key, ...rest] = path;
+
+        if (rest.length === 0) {
+            obj[key] = value;
+        } else {
+            if (!obj[key] || typeof obj[key] != "object") {
+                obj[key] = {};
+            }
+            this.insertEntry(obj[key], rest, value);
+        }
+    }
+
+    retrieveEntry(obj, path) {
+        if (typeof path === "string") path = path.split(".");
+        if (path.length === 0) return obj;
+
+        const [key, ...rest] = path;
+
+        // If the key doesn't exist or obj is not an object, return undefined
+        if (!obj || typeof obj !== "object" || !(key in obj)) {
+            return undefined;
+        }
+
+        // Recurse down the tree
+        return this.retrieveEntry(obj[key], rest);
+    }
+
+    deleteEntry(obj, path) {
+        if (typeof path === "string") path = path.split(".");
+        if (path.length === 0 || typeof obj !== "object" || obj === null) return;
+
+        const [key, ...rest] = path;
+
+        if (rest.length === 0) {
+            // Final key: delete it
+            delete obj[key];
+        } else {
+            // Recurse deeper
+            if (obj[key] && typeof obj[key] === "object") {
+                this.deleteEntry(obj[key], rest);
+
+                // Optionally, clean up empty objects
+                if (Object.keys(obj[key]).length === 0) {
+                    delete obj[key];
+                }
+            }
+        }
+    }
+
+
+    stringify() {
+        return JSON.stringify(this.botionJSON);
+    }
+
+    /*setter*/
+    set set_botionJSON(botionJSON) {
+        this.#botionJSON = JSON.parse(botionJSON);
+    }
+
+    /* getter */
+    get get_botionJSON() {
         return this.#botionJSON;
     }
     #botionJSON;
@@ -406,6 +470,8 @@ The Class that will be the "working" memory of Botion web application
 this is almost exactly like the managers, but it will probably carry state of the application. Which 
 makes sense in this case.
 */
+
+
 class BotionMemory {
     constructor() {
         if (BotionMemory.instance) {
@@ -420,7 +486,6 @@ class BotionMemory {
 
     /*Concrete component functionality */
     update_Component(message) {
-        const botionInstanceRef = BotionMemory.getInstance();
         /* Okay so this is what I've been planning to do with my application and how 
         it works mainly with the updates. 
         
@@ -449,29 +514,19 @@ class BotionMemory {
         switch (message.state) {
             case "WRITE":
                 {
-                    const jsonRef = botionInstanceRef.get_BotionJSON;
-                    let stringtoparse = JSON.parse(JSON.stringify(CardManager.getInstance().get_cardsArray));
-                    let tostring = JSON.stringify(CardManager.getInstance().get_cardsArray);
+                    const botionref = botionSerial.get_botionJSON;
+                    const cardref = CardManager.getInstance().get_cardsArray;
+                    const cardIndividual = cardref[0];
+                    // In order to save the card you want 
+                    // 1. save the object type in the json 
+                    // 2. save the object html div id 
+                    // 3. save the object html div text content.
+                    console.log(message);
 
-                    //          console.log(stringtoparse);
-                    //          console.log(tostring);
-                    //          console.log(CardManager.getInstance().get_cardsArray[0]);
-                    //console.log(CardManager.getInstance().get_cardsArray[0]);
-                   // console.log(CardManager.getInstance().get_cardsArray[0].htmlref);
+                    botionSerial.insertEntry(botionref, `BotionData.card`, cardIndividual);
+                    console.log(JSON.stringify(botionSerial.get_botionJSON));
+                    console.log(botionSerial);
 
-                    const card0 = CardManager.getInstance().get_cardsArray[0];
-                    const divElement = document.getElementById("card-1");
-
-                    const allprops= getAllPropertyValues(divElement);
-                    console.log(allprops);
-                    console.dir(divElement);
-
-                    // console.dir(divElement);
-                    // for (let key in card0) {
-                    //     if (card0.hasOwnProperty(key)) {
-                    //         console.log(`${key}: ${card0[key]}`);
-                    //     }
-                    // }
 
                     break;
                 }
@@ -690,6 +745,7 @@ const botionMem = new BotionMemory();
 const mediator = new Mediator();
 const cardMang = new CardManager();
 const styleMang = new StyleManager();
+const botionSerial = new BotionSerializer();
 const DashBoardNode = document.getElementById("dash");
 /*Global variables */
 
@@ -751,6 +807,8 @@ function intialize() {
     mediator.register("CardManager", cardMang.get_Component);
     mediator.register("StyleManager", styleMang.get_Component);
     mediator.register("Mediator", mediator.get_component);
+
+    botionSerial.set_botionJSON = BASEBOTIONJSON;
 
     document.head.appendChild(styleMang.get_Style);
 

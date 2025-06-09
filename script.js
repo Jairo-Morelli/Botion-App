@@ -285,20 +285,13 @@ class Card {
         switch (this.state) {
             case "idle":
                 {
+                    this.#state = "idle";
                     this.isSelected = false;
                     break;
                 }
-            /* Telling the card to have a state of selected is easy, 
-            but what about de-selecting a card? Pretty simply, just do, in your 
-            event system. If card has been previously selected, de-select it. 
-            
-            How can I deselect something I don't have a reference to?
-            
-            You can check state in your managers, updates. 
-            
-            This particular scenario is like*/
             case "selected":
                 {
+                    this.#state = "selected";
                     this.isSelected = true;
                     break;
                 }
@@ -306,6 +299,10 @@ class Card {
                 break;
             }
         }
+    }
+
+    get getState() {
+        return this.state;
     }
 
 
@@ -366,7 +363,7 @@ class CardManager {
                     let template = document.createElement("div");
                     template.setAttribute("class", "Card Component");
                     // what is the id here?
-                    template.setAttribute("id", "card-"+message.currentCard.id);
+                    template.setAttribute("id", "card-" + message.currentCard.id);
 
                     CardManager.getInstance().get_Component.send(message, "StyleManager");
 
@@ -405,14 +402,14 @@ class CardManager {
         card_.id = this.#cardsArray.length + 1;
         //assigning all new data to BotionAppEventData.currentCard
         //also assigning a state called ADDCSS
-        
+
         // this is an event system message, within a event system message.
-        let data = new BotionAppEventData(null,card_,"ADDCSS");
+        let data = new BotionAppEventData(null, card_, "ADDCSS");
 
         //send a Eventdata, sending a message that will inject css into my card.
         this.#component.send(data, "StyleManager");
 
-        
+
 
         this.#cardsArray.push(data.currentCard);
         return data.currentCard
@@ -497,7 +494,7 @@ class StyleManager {
 
                     const sNode = document.getElementById("mod-style");
                     sNode.append(styleTemplate);
-                    
+
                     break;
                 }
             case "WRITETOAPP":
@@ -685,21 +682,41 @@ let applicationReadHandler = function (data_) {
 
 
 let dashBoardUpdateHandler = function (data_) {
-    const card = data_.data.card_;
-    const event = data_.data.event;
-    const string = data_.data.text;
-    //check to see if all the data is valid up to the card itself.
-    if (data_ != undefined) {
-        if (card != undefined) {
-            if (event != undefined) {
-                card.setState("selected");
-            }
+
+    /*because all information here is mutiable 
+    I am going to keep most things here as a let variable */
+    let card = data_.data.currentCard;
+    let event = data_.data.eventType;
+    let string = data_.data.text;
+
+    /*
+    * if currentCard is the one that has been selected, then give it functionality, 
+    if the currentCard isn't the one that has been selected look for the new selected one, 
+    if it doesn't exist, run the rest of the if statement.
+    */
+
+    /* 
+      you might want to not use card, in this case. because 
+      you're checking to see if a card has been given the selected 
+      state which is almost like you checking a previous update. 
+
+    this code below, is working in a different context to your pure 
+    event system data, update code.
+    */
+    const cardRef = CardManager.getInstance();
+    for (let i = 0; i < cardRef.get_cardsArray.length; i++) {
+        if (cardRef.get_cardsArray[i].getState == "selected") {
+            card = cardRef.get_cardsArray[i];
         }
-        //check to see if the data objects has any text from 
-        //the keyboard listener
-        if (string != undefined) {
-            console.log("Keyboard input:" + data_.data.text);
-            mediator.send(data_.data, "Mediator", "CardManager");
+    }
+
+    if (card != undefined) {
+        if (card.getState == "selected") {
+            card.htmlref.textContent += string;
+        } else if (card.getState == "idle") {
+
+        } else {
+
         }
     }
 
@@ -749,16 +766,16 @@ let keyboardHandler = function (event_) {
                 {
                     break;
                 }
-            
+
             case "s":
                 {
-                    
+                    //going to change this.
                     applicationWriteHandler(data);
                     break;
                 }
             case "i":
                 {
-                    
+                    //going to change this.
                     applicationReadHandler(data);
                     break;
                 }
@@ -785,20 +802,22 @@ let habitButtonH_over = function (event) {
     update_Application(null);
 }
 addHabitButton.addEventListener("mouseover", (event) => {
-    let data= new BotionAppEventData(event,null,"mouseover");
+    let data = new BotionAppEventData(event, null, "mouseover");
     habitButtonH_over(data);
 })
 
 let cardHasBeenSelectedHandler_click = function (data_) {
+    data_.currentCard.setState("selected");
+    console.log(data_);
     update_Application(data_);
 }
 
 let addCardButtonHandler_up = function (data_) {
-    
+
     let data = data_;
     let newCard = new Card();
 
-    data.currentCard=newCard;
+    data.currentCard = newCard;
 
     data.currentCard = cardMang.createCard(newCard);
 
@@ -806,8 +825,8 @@ let addCardButtonHandler_up = function (data_) {
 
     //I have to pass the card into this handler
     data.currentCard.htmlref.addEventListener("click", (event_) => {
-        
-        let data = new BotionAppEventData(event_, newCard.htmlref, "selected");
+
+        let data = new BotionAppEventData(event_, newCard, "selected");
         data.eventType = data.event;
         cardHasBeenSelected(data);
     }
@@ -817,7 +836,7 @@ let addCardButtonHandler_up = function (data_) {
 }
 addHabitButton.addEventListener("mouseup", (event_) => {
 
-    let data = new BotionAppEventData(event_,null,"mouseup");
+    let data = new BotionAppEventData(event_, null, "mouseup");
 
     addNewCard(data);
 });
@@ -825,7 +844,7 @@ addHabitButton.addEventListener("mouseup", (event_) => {
 let addButtonHoverInfoHandler_leave = function (data_) {
 
     let data = data_;
-    
+
     const addDivElements = document.getElementsByClassName("Btn");
 
     const addHoverInfo = addDivElements[0].children[0];
@@ -836,7 +855,7 @@ let addButtonHoverInfoHandler_leave = function (data_) {
 }
 
 addHabitButton.addEventListener("mouseleave", (event_) => {
-    let data = new BotionAppEventData(event_,null,"mouseleave");
+    let data = new BotionAppEventData(event_, null, "mouseleave");
 
     addButtonHoverInfo(data);
 })

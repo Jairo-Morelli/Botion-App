@@ -1,25 +1,25 @@
-html{
-    background-color:  #343835;
+html {
+    background-color: #343835;
     opacity: 0.9;
 }
 
-.DashBoard
-{
+.DashBoard {
     display: flex;
 }
 
-.DashBoard.Component{
+.DashBoard.Component {
     display: flex;
     flex-wrap: wrap;
 }
-.saveIcon.Component{
+
+.saveIcon.Component {
     display: flex;
     align-self: self-start;
     margin-left: auto;
 
 }
 
-.saveIcon.Component img{
+.saveIcon.Component img {
     width: 100px;
     height: auto;
 
@@ -29,12 +29,12 @@ html{
     P element is purposefully hidden, and should only show up 
     when the button is hovered over.
 */
-.Btn.Component p{
+.Btn.Component p {
     color: #7a857d;
     font-size: 10px;
     margin-left: 50%;
     margin-bottom: 1.0px;
-   /* visibility: hidden; I did it like this first*/
+    /* visibility: hidden; I did it like this first*/
     opacity: 0.0;
 }
 
@@ -44,7 +44,7 @@ html{
     I have to know what is its parent element.
 */
 .Btn.Component {
-    margin-top: 5%; 
+    margin-top: 5%;
 }
 
 .Btn.Component button {
@@ -62,47 +62,112 @@ html{
 
 }
 
-.Btn.Component button:hover{
+.Btn.Component button:hover {
     outline: none;
     transform: scale(1.1);
-    background-color:  #3d423e;
+    background-color: #3d423e;
 }
 
 
-.BotionTeacher
-{
+.BotionTeacher {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-top: 20rem;
-    transform: scale(2.0);
 }
 
-.Chatbox.Component{
+/*Move the Chatbox component if you want to move 
+both the chatbox and the teacher sprites.
 
-}
-.Chatbox.Component.text{
-    margin-left: 1.2em;
-    margin-bottom: -2.0em;
-    z-index:3;
-    font-size: 20px;
-    font-weight: 900;
-    color: white;
-}
+I mean this works for now, but the reality of the situation is that
+due to my scaling issues for my text box and my text, I am not able 
+to place my images and my text whereever I want them.
+ 
+I want you to remember this situation. 
+
+This is why you usually try to learn everything right away. Because 
+you see yourself having to compromise as a weakness, and in some 
+ways it is. 
+
+but there is no possible way that you can learn everything, 
+and build the project, whilst knowing everything. 
+
+This is why you deliver this here. what you can with what you know. 
+Then later you learn how to deliver, you specific use case. 
+
+Which is how do I use css, to basically create whatever kind of 
+sprite functionality that I 
+*/
+
 /*Move the Chatbox component if you want to move 
 both the chatbox and the teacher sprites.*/
-.Chatbox.Component img{
-    display:block;
-    width: 100%;
-    height: auto;
-    z-index:0;
+
+.Chatbox.Component {
+    margin-right: 27em;
+    display: inline-block;
+    background-image: url('assets/chatbox.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 600px;
+    height: 600px;
+    flex-shrink: 0;
+    margin-bottom: -25em;
+}
+
+/* 
+    okay the reason that you don't chain the classes 
+    together is because when you do that you basically want 
+    some sort of similar changes done throughout all the classes
+    that contain those classes. That is when you stop.
+*/
+.text {
+    margin-left: 1.85em;
+    margin-top: 1.8em;
+    font-size: 22px;
+    font-weight: 900;
+    color: white;
+    width: 450px;
+    height: 130px;
+    z-index: 3;
+}
+
+
+.Teacher.Component {
+    display: inline-block;
+    background-image: url(assets/teacher.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 300px;
+    height: 300px;
+    flex-shrink: 0;
 }
 
 
 
-.teacher.Component{
-
+#card-testing.Card.Component{
+    width:140px;
+    height:140px;
+    padding:10px;
+    background: #669171;
+    overflow-wrap: anywhere;
+    border: 2.5px solid #0c0d0c;
+    opacity: 0.5;
+    /*Learn what these values mean.
+    1. define the animation name 
+    2. define the amount of steps or intervals
+    3. define the type of animation timing 
+    */
+    animation: 4s steps(50) infinite flipping;
 }
 
-.teacher.Component img{
+@keyframes flipping{
+    0%{transform: translateX(0px);}
+    25%{background-color: #669171;}
+    50%{background-color: #0ee88a ;
+        transform: rotateY(90deg);}
+    75%{background-color:#0ed2e8;}
+    100%{background-color: #0e8ae8;
+        transform:rotatey(0deg);
+       }
+    
 }

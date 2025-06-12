@@ -75,7 +75,7 @@ class BotionAppEventData {
         this.eventType = eventType_;
         this.currentCard = currentCard_;
         this.state = state_;
-        this.text = "";
+        this.cardText = "";
     }
 }
 
@@ -159,6 +159,10 @@ class BotionSerializer {
     #botionJSON;
 }
 
+
+class BotionTeacher{
+    
+}
 
 /*
     Making BotionSerializer a child class of Botion
@@ -276,7 +280,11 @@ class Card {
      */
 
     set text(text_) {
-        this.#cardText = text_;
+        this.cardText = text_;
+    }
+    // don't think that this is a good idea.
+    addChar(char_) {
+        this.cardText += char_;
     }
 
     setState(newState_) {
@@ -285,13 +293,13 @@ class Card {
         switch (this.state) {
             case "idle":
                 {
-                    this.#state = "idle";
+                    this.state = "idle";
                     this.isSelected = false;
                     break;
                 }
             case "selected":
                 {
-                    this.#state = "selected";
+                    this.state = "selected";
                     this.isSelected = true;
                     break;
                 }
@@ -310,8 +318,8 @@ class Card {
     hasChanged;
     htmlref;
     id;
-    #state;
-    #cardText;
+    cardText;
+    state;
     #component;
 }
 
@@ -357,7 +365,9 @@ class CardManager {
             case "WRITETOAPP":
                 {
 
-                    console.log(message.currentCard);
+
+
+                    let templateCard = new Card();
 
 
                     let template = document.createElement("div");
@@ -367,7 +377,33 @@ class CardManager {
 
                     CardManager.getInstance().get_Component.send(message, "StyleManager");
 
-                    message.currentCard.htmlref = template;
+                    /*Create a temporary card class, save all the json information
+                    to it, then use that temporary class to assign to Eventsystem 
+                    object.s
+
+              */
+                    templateCard.type = message.currentCard.type;
+                    templateCard.isSelected = message.currentCard.isSelected;
+                    templateCard.hasChanged = message.currentCard.hasChanged;
+                    templateCard.id = message.currentCard.id;
+                    templateCard.state = message.currentCard.state;
+                    templateCard.text = message.currentCard.cardText;
+
+                    templateCard.htmlref = template;
+                    templateCard.htmlref.textContent = message.currentCard.cardText;
+
+
+
+
+                    message.currentCard = templateCard;
+
+
+                    message.currentCard.htmlref.addEventListener("click", (event_) => {
+                        let data = new BotionAppEventData(event_, templateCard, "selected");
+                        cardHasBeenSelected(data);
+                    })
+
+                    console.log(message.currentCard.htmlref);
 
                     CardManager.getInstance().get_cardsArray.push(message.currentCard);
 
@@ -383,6 +419,16 @@ class CardManager {
 
     get get_cardsArray() {
         return this.#cardsArray;
+    }
+
+    get previous_card()
+    {
+        return this.#previousCard;
+    }
+
+    set_previous_card(prevCard)
+    {
+        this.#previousCard=prevCard;
     }
 
     //create card from blank.
@@ -414,9 +460,6 @@ class CardManager {
         this.#cardsArray.push(data.currentCard);
         return data.currentCard
     }
-    createCardJSON(card_) {
-
-    }
 
     //create card from data
 
@@ -425,6 +468,7 @@ class CardManager {
     }
 
     static instance;
+    #previousCard;
     #component;
     #cardsArray = [];
 }
@@ -588,6 +632,7 @@ class BotionMemory {
                             let data = new BotionAppEventData();
 
                             console.log(`Object key: ${objKey}`);
+                            console.log(nestedObj);
                             let card = nestedObj;
 
                             /* with the objects in this loop, 
@@ -597,7 +642,7 @@ class BotionMemory {
 
                             data.currentCard = card;
                             data.state = "WRITETOAPP";
-                            mediator.send(data, "BotionMemory", "CardManager", data);
+                            mediator.send(data, "BotionMemory", "CardManager");
 
 
                             for (let prop in nestedObj) {
@@ -668,16 +713,19 @@ let updateHandler = function (data_) {
  call botionMemory.update_Component using the mediator
 */
 let applicationWriteHandler = function (data_) {
-    data_ = new BotionAppEventData(null, null, "WRITE");
-    console.log(data_.state);
-    // mediator.get_component.send(data_, "botionMemory");
     mediator.send(data_, "Mediator", "BotionMemory");
 }
 
 let applicationReadHandler = function (data_) {
-    data_ = new BotionAppEventData(null, null, "READ");
+    data_ = new BotionAppEventData(null, new Card(), "READ");
     console.log(data_.state);
     mediator.send(data_, "Mediator", "BotionMemory");
+}
+
+let applicationIconSaveHandler = function (data_) {
+    data_.state = "WRITE";
+    console.log("saved application");
+    applicationWriteHandler(data_);
 }
 
 
@@ -705,257 +753,275 @@ let dashBoardUpdateHandler = function (data_) {
     */
     const cardRef = CardManager.getInstance();
     for (let i = 0; i < cardRef.get_cardsArray.length; i++) {
+        // how do I make sure only one card can be selected?
         if (cardRef.get_cardsArray[i].getState == "selected") {
             card = cardRef.get_cardsArray[i];
+            CardManager.getInstance().set_previous_card(card);
         }
     }
+
+
+
 
     if (card != undefined) {
-        if (card.getState == "selected") {
-            card.htmlref.textContent += string;
-        } else if (card.getState == "idle") {
+        if (string != undefined) {
+            if (card.getState == "selected") {
+                card.htmlref.textContent += string;
+                card.addChar(string);
 
-        } else {
+            } else if (card.getState == "idle") {
 
+            }
         }
-    }
 
+    }
 }
 
-document.addEventListener("update", function (data_) {
+    document.addEventListener("update", function (data_) {
 
-    console.log("update");
-    // In here you can section of multiple different updates for mutliple different update features.
-    dashBoardUpdateHandler(data_);
+        console.log("update");
+        // In here you can section of multiple different updates for mutliple different update features.
+        dashBoardUpdateHandler(data_);
 
-});
+    });
 
 
-document.addEventListener("applicationSave", function (data_) {
+    document.addEventListener("applicationSave", function (data_) {
 
-})
+    })
 
-let keyboardHandler = function (event_) {
-    const character = event_.key;
-    let keyboardChar;
-    let data = new BotionAppEventData(event_, null, "keypress");
-    data.text = character;
-    if (character != undefined) {
-        switch (data.eventType.key) {
-            //This will be remove in the near future this is simply just 
-            //how I am building this new feature.
-            //Since I am only sending the the keycodes and not changing the data, of the card here 
-            // I might have to make it so that the cards, update themselves.
-            case "Enter":
-                {
+    let keyboardHandler = function (event_) {
+        const character = event_.key;
+        let keyboardChar;
+        let data = new BotionAppEventData(event_, null, "keypress");
+        data.text = character;
+        if (character != undefined) {
+            switch (data.eventType.key) {
+                //This will be remove in the near future this is simply just 
+                //how I am building this new feature.
+                //Since I am only sending the the keycodes and not changing the data, of the card here 
+                // I might have to make it so that the cards, update themselves.
+                //Enter should be a special command
+                /* in this particular case you would have to do some sort of 
+                css manipulation in order to complete this. */
+                case "Enter":
+                    {
+                        data.text = "\n";
+                        break;
+                    }
+                case "Tab":
+                    {
+                        data.text += '\t';
+                        break;
+                    }
+                case " ":
+                    {
+                        data.text += ' '
+                        break;
+                    }
+                //Ignore this input
+                case "Control":
+                    {
 
-                    break;
-                }
-            case "Tab":
-                {
-                    keyboardChar += '\t';
-                    break;
-                }
-            case " ":
-                {
-                    keyboardChar += ' '
-                    break;
-                }
-            //Ignore this input
-            case "Control":
-                {
-                    break;
-                }
-
-            case "s":
-                {
-                    //going to change this.
-                    applicationWriteHandler(data);
-                    break;
-                }
-            case "i":
-                {
-                    //going to change this.
-                    applicationReadHandler(data);
-                    break;
-                }
-            default:
-                {
-                    break;
-                }
+                        break;
+                    }
+                default:
+                    {
+                        break;
+                    }
+            }
         }
+        update_Application(data);
     }
-    update_Application(data);
-}
-document.addEventListener("keyup", (event) => {
-    keyboardpress_up(event);
-})
+    document.addEventListener("keyup", (event) => {
+        keyboardpress_up(event);
+    })
 
-const addHabitButton = document.getElementById("btn-add");
 
-let habitButtonH_over = function (event) {
-    //Access div container through .html .css attribute
-    const addDivElements = document.getElementsByClassName("Btn");
+    /*Intialization of html elements that I will use at the beginning 
+    of my application  */
+    const addHabitButton = document.getElementById("btnAdd");
+    const saveIcon = document.getElementById("saveimg");
 
-    const addHoverInfo = addDivElements[0].children[0];
-    addHoverInfo.style.opacity = 1.0;
-    update_Application(null);
-}
-addHabitButton.addEventListener("mouseover", (event) => {
-    let data = new BotionAppEventData(event, null, "mouseover");
-    habitButtonH_over(data);
-})
 
-let cardHasBeenSelectedHandler_click = function (data_) {
-    data_.currentCard.setState("selected");
-    console.log(data_);
-    update_Application(data_);
-}
+    let habitButtonH_over = function (event) {
+        //Access div container through .html .css attribute
+        const addDivElements = document.getElementsByClassName("Btn");
 
-let addCardButtonHandler_up = function (data_) {
-
-    let data = data_;
-    let newCard = new Card();
-
-    data.currentCard = newCard;
-
-    data.currentCard = cardMang.createCard(newCard);
-
-    DashBoardNode.append(data.currentCard.htmlref);
-
-    //I have to pass the card into this handler
-    data.currentCard.htmlref.addEventListener("click", (event_) => {
-
-        let data = new BotionAppEventData(event_, newCard, "selected");
-        data.eventType = data.event;
-        cardHasBeenSelected(data);
+        const addHoverInfo = addDivElements[0].children[0];
+        addHoverInfo.style.opacity = 1.0;
+        update_Application(null);
     }
-    )
+    addHabitButton.addEventListener("mouseover", (event) => {
+        let data = new BotionAppEventData(event, null, "mouseover");
+        habitButtonH_over(data);
+    })
 
-    update_Application(data_);
-}
-addHabitButton.addEventListener("mouseup", (event_) => {
+    let cardHasBeenSelectedHandler_click = function (data_) {
+        data_.currentCard.setState("selected");
+        if(CardManager.getInstance().previous_card!=undefined)
+        {
+            CardManager.getInstance().previous_card.setState("idle");
+        }
+        CardManager.getInstance().set_previous_card(data_.currentCard);
+      
+        console.log(data_);
+        update_Application(data_);
+    }
 
-    let data = new BotionAppEventData(event_, null, "mouseup");
+    let addCardButtonHandler_up = function (data_) {
 
-    addNewCard(data);
-});
+        let data = data_;
+        let newCard = new Card();
 
-let addButtonHoverInfoHandler_leave = function (data_) {
+        data.currentCard = newCard;
 
-    let data = data_;
+        data.currentCard = cardMang.createCard(newCard);
 
-    const addDivElements = document.getElementsByClassName("Btn");
+        DashBoardNode.append(data.currentCard.htmlref);
 
-    const addHoverInfo = addDivElements[0].children[0];
+        //I have to pass the card into this handler
+        data.currentCard.htmlref.addEventListener("click", (event_) => {
 
-    addHoverInfo.style.opacity = 0.0;
+            let data = new BotionAppEventData(event_, newCard, "selected");
+            data.eventType = data.event;
+            cardHasBeenSelected(data);
+        }
+        )
 
-    update_Application(null);
-}
+        update_Application(data_);
+    }
+    addHabitButton.addEventListener("mouseup", (event_) => {
 
-addHabitButton.addEventListener("mouseleave", (event_) => {
-    let data = new BotionAppEventData(event_, null, "mouseleave");
+        let data = new BotionAppEventData(event_, null, "mouseup");
 
-    addButtonHoverInfo(data);
-})
+        addNewCard(data);
+    });
 
-/*Event Listeners*/
-/*Global variables */
-//Instantiate Botion Mem
-//Instantiate BotionMediator 
-//Instantiate CardMang
-//Instantiate styleMang
-const botionMem = new BotionMemory();
-const mediator = new Mediator();
-const cardMang = new CardManager();
-const styleMang = new StyleManager();
-const botionSerial = new BotionSerializer();
-const DashBoardNode = document.getElementById("dash");
-/*Global variables */
+    let addButtonHoverInfoHandler_leave = function (data_) {
 
-/*Mediator Custom Event defintions */
+        let data = data_;
 
-function update_Application(data_) {
-    mediator.dispatch("applicationUpdate", data_);
-}
+        const addDivElements = document.getElementsByClassName("Btn");
 
-function keyboardpress_up(data_) {
-    mediator.dispatch("keyboardup", data_);
-}
+        const addHoverInfo = addDivElements[0].children[0];
 
-function addNewCard(data_) {
-    mediator.dispatch("addnewcard", data_);
-}
+        addHoverInfo.style.opacity = 0.0;
 
-function cardHasBeenSelected(data_) {
-    mediator.dispatch("cardhasbeenselected", data_);
-}
+        update_Application(null);
+    }
 
-function addButtonHoverInfo(data_) {
-    mediator.dispatch("addbuttonhoverinfo_leave", data_);
-}
+    addHabitButton.addEventListener("mouseleave", (event_) => {
+        let data = new BotionAppEventData(event_, null, "mouseleave");
 
-function dashBoard_Update(data_) {
-    mediator.dispatch("dashboardupdate", data_);
-}
+        addButtonHoverInfo(data);
+    })
 
-function botionapp_Writer(data_) {
-    mediator.dispatch("save", data_);
-}
+    saveIcon.addEventListener("mouseup", (event_) => {
+        let data = new BotionAppEventData(event_, null, "mouseup");
 
-function botionapp_Reader(data_) {
-    mediator.dispatch("read", data_);
-}
-/*Mediator Custom Event defintions */
+        saveBotionIcon(data);
+    })
 
-/* Mediator Custom Event enabling */
-mediator.enable("applicationUpdate", updateHandler);
-mediator.enable("keyboardup", keyboardHandler);
+    /*Event Listeners*/
+    /*Global variables */
+    //Instantiate Botion Mem
+    //Instantiate BotionMediator 
+    //Instantiate CardMang
+    //Instantiate styleMang
+    const botionMem = new BotionMemory();
+    const mediator = new Mediator();
+    const cardMang = new CardManager();
+    const styleMang = new StyleManager();
+    const botionSerial = new BotionSerializer();
+    const DashBoardNode = document.getElementById("dash");
+    /*Global variables */
 
-mediator.enable("addnewcard", addCardButtonHandler_up);
-mediator.enable("cardhasbeenselected", cardHasBeenSelectedHandler_click);
+    /*Mediator Custom Event defintions */
 
-mediator.enable("addbuttonhoverinfo_leave", addButtonHoverInfoHandler_leave);
-mediator.enable("dashboardupdate", dashBoardUpdateHandler);
+    function update_Application(data_) {
+        mediator.dispatch("applicationUpdate", data_);
+    }
 
-mediator.enable("write", applicationWriteHandler);
-mediator.enable("read", applicationReadHandler);
-/* Mediator Custom Event enabling */
+    function keyboardpress_up(data_) {
+        mediator.dispatch("keyboardup", data_);
+    }
+
+    function addNewCard(data_) {
+        mediator.dispatch("addnewcard", data_);
+    }
+
+    function cardHasBeenSelected(data_) {
+        mediator.dispatch("cardhasbeenselected", data_);
+    }
+
+    function addButtonHoverInfo(data_) {
+        mediator.dispatch("addbuttonhoverinfo_leave", data_);
+    }
+
+    function dashBoard_Update(data_) {
+        mediator.dispatch("dashboardupdate", data_);
+    }
+
+    function botionapp_Writer(data_) {
+        mediator.dispatch("save", data_);
+    }
+
+    function botionapp_Reader(data_) {
+        mediator.dispatch("read", data_);
+    }
+
+    function saveBotionIcon(data_) {
+        mediator.dispatch("saveIcon", data_);
+    }
+    /*Mediator Custom Event defintions */
+
+    /* Mediator Custom Event enabling */
+    mediator.enable("applicationUpdate", updateHandler);
+    mediator.enable("keyboardup", keyboardHandler);
+
+    mediator.enable("addnewcard", addCardButtonHandler_up);
+    mediator.enable("cardhasbeenselected", cardHasBeenSelectedHandler_click);
+
+    mediator.enable("addbuttonhoverinfo_leave", addButtonHoverInfoHandler_leave);
+    mediator.enable("dashboardupdate", dashBoardUpdateHandler);
+
+    mediator.enable("write", applicationWriteHandler);
+    mediator.enable("read", applicationReadHandler);
+    mediator.enable("saveIcon", applicationIconSaveHandler);
+    /* Mediator Custom Event enabling */
 
 
-/*Application Code  */
+    /*Application Code  */
 
-function intialize() {
+    function intialize() {
 
-    mediator.register("BotionMemory", botionMem.get_Component);
-    mediator.register("CardManager", cardMang.get_Component);
-    mediator.register("StyleManager", styleMang.get_Component);
-    mediator.register("Mediator", mediator.get_component);
+      
 
-    botionSerial.set_botionJSON = BASEBOTIONJSON;
+        mediator.register("BotionMemory", botionMem.get_Component);
+        mediator.register("CardManager", cardMang.get_Component);
+        mediator.register("StyleManager", styleMang.get_Component);
+        mediator.register("Mediator", mediator.get_component);
 
-    document.head.appendChild(styleMang.get_Style);
+        botionSerial.set_botionJSON = BASEBOTIONJSON;
 
-}
+        document.head.appendChild(styleMang.get_Style);
+
+          //reload previously saved cards.
+          if (localStorage.getItem("BotionData")) {
+            window.addEventListener("DOMContentLoaded", () => {
+                applicationReadHandler();
+            });
+        }
+
+    }
 
 
-intialize();
-update_Application();
+    intialize();
+    update_Application();
 
 
 //let saveInterval = setInterval(applicationReadHandler, 2000); // Calls every 2.5 minutes, 150,000 ms = 2.5 minutes
 
 //applicationWriteHandler();
 /*Application Code  */
-
-//irrelavent 
-// const file = new Blob(["foo"], {type: 'text/plain'});
-// // Create a temporary URL for the Blob
-// const url = URL.createObjectURL(file);
-// // Create an anchor and trigger download 
-// const a = document.createElement('a');
-// a.href = url;
-// a.download = file;
-// a.click();
-

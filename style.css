@@ -157,17 +157,40 @@ both the chatbox and the teacher sprites.*/
     2. define the amount of steps or intervals
     3. define the type of animation timing 
     */
-    animation: 4s steps(50) infinite flipping;
+ 
+}
+
+.animate{
+    animation: 4s steps(400) 1 forwards flipping;
+}
+
+.animate1
+{
+    animation: 4s steps(400) 1 forwards flipping1;
 }
 
 @keyframes flipping{
-    0%{transform: translateX(0px);}
-    25%{background-color: #669171;}
-    50%{background-color: #0ee88a ;
-        transform: rotateY(90deg);}
-    75%{background-color:#0ed2e8;}
-    100%{background-color: #0e8ae8;
-        transform:rotatey(0deg);
-       }
+   from{
+    transform: rotateY(0deg);
+    background:#669171
+   }
+
+   to{
+    transform: rotateY(180deg);
+    background:#0eebeb;
+   }
     
+}
+
+@keyframes flipping1
+{
+    from{
+        transform: rotateY(180deg);
+        background-color: #0eebeb;
+    }
+
+    to{
+        transform: rotateY(0deg);
+        background:#669171
+    }
 }

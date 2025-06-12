@@ -60,6 +60,15 @@ const applicationUpdate = new CustomEvent("update", {
 }
 );
 
+const cardflipEvent = new CustomEvent("flip",
+    {
+        detail: { message: "card flip event" },
+        bubbles: true,
+        cancelable: true,
+        data: []
+    }
+);
+
 const applicationSave = new CustomEvent("save", {
     detail: { message: "save event" },
     bubbles: true,
@@ -489,6 +498,7 @@ class StyleManager {
             console.error("Already existing instance of StyleManager Object");
         }
         StyleManager.instance = this;
+        this.cardAnimations = [];
         this.#component = new Component("Style");
         this.#component.updateComponent = this.update_Component;
         this.#style = document.createElement("style");
@@ -574,6 +584,7 @@ class StyleManager {
         return this.#style;
     }
     static instance;
+    cardAnimations = [];
     #component;
     #style;
 }
@@ -842,9 +853,8 @@ const addHabitButton = document.getElementById("btnAdd");
 const saveIcon = document.getElementById("saveimg");
 
 //Remember you're working with css here, not html
-const cardFlipquery = document.querySelector("#card-testing.Card.Component");
 const testcard = document.getElementById("card-testing");
-console.log(cardFlipquery);
+//console.log(cardFlipquery);
 /*Testing animation event listeners */
 /*  cardFlip.addEventListener("animationstart",cardFlipHandler,false);
   cardFlip.addEventListener("animationend", cardFlipHandler, false);
@@ -875,22 +885,25 @@ console.log(cardFlipquery);
        */
 
 
-testcard.addEventListener("click", flip);
+
 
 function flip(event_) {
 
-    let flag = cardFlipquery.classList.contains("animate");
-
+    let flag = CardManager.getInstance().get_cardsArray[2].htmlref.classList.contains("anim-card-front");
+    console.log(event_.type);
     if (flag == false) {
-        cardFlipquery.classList.add("animate");
+        testcard.classList.add("anim-card-front");
+        testcard.classList.remove("anim-card-back");
         console.log("reached false");
     } else if (flag == true) {
-        cardFlipquery.classList.remove("animate");
-        cardFlipquery.classList.add("animate1");
+        testcard.classList.remove("anim-card-front");
+        testcard.classList.add("anim-card-back");
         console.log("reached true");
     }
 
 }
+
+
 
 
 
@@ -912,6 +925,11 @@ let cardHasBeenSelectedHandler_click = function (data_) {
     if (CardManager.getInstance().previous_card != undefined) {
         CardManager.getInstance().previous_card.setState("idle");
     }
+
+    const cardref = CardManager.getInstance().get_cardsArray[2];
+
+    cardref.htmlref.dispatchEvent(cardflipEvent);
+
     CardManager.getInstance().set_previous_card(data_.currentCard);
 
     console.log(data_);
@@ -1060,14 +1078,17 @@ function intialize() {
     if (localStorage.getItem("BotionData")) {
         window.addEventListener("DOMContentLoaded", () => {
             applicationReadHandler();
+          const cardref=  CardManager.getInstance().get_cardsArray[2];
+
+          cardref.htmlref.addEventListener("flip",flip);
         });
     }
-
 }
 
 
 intialize();
 update_Application();
+
 
 
 //let saveInterval = setInterval(applicationReadHandler, 2000); // Calls every 2.5 minutes, 150,000 ms = 2.5 minutes

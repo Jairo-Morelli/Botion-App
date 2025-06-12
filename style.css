@@ -152,6 +152,7 @@ both the chatbox and the teacher sprites.*/
     overflow-wrap: anywhere;
     border: 2.5px solid #0c0d0c;
     opacity: 0.5;
+    color: white;
     /*Learn what these values mean.
     1. define the animation name 
     2. define the amount of steps or intervals
@@ -160,37 +161,52 @@ both the chatbox and the teacher sprites.*/
  
 }
 
-.animate{
-    animation: 4s steps(400) 1 forwards flipping;
+/*I have to use javascript, in order to inject these into my html*/
+.anim-card-front{
+    animation: 4s steps(400) 1 forwards frontCardFlip;
+}
+/*I have to use javascript, in order to inject these into my html*/
+.anim-card-back{
+    animation: 4s steps(400) 1 forwards backCardFlip;
 }
 
-.animate1
-{
-    animation: 4s steps(400) 1 forwards flipping1;
-}
-
-@keyframes flipping{
+@keyframes frontCardFlip{
    from{
     transform: rotateY(0deg);
-    background:#669171
+    background:#669171;
+    color:white;
    }
+   55%{
+    color:transparent;
+   }
+
 
    to{
     transform: rotateY(180deg);
     background:#0eebeb;
+    color:transparent;
+
    }
     
 }
 
-@keyframes flipping1
-{
+@keyframes backCardFlip{
     from{
         transform: rotateY(180deg);
         background-color: #0eebeb;
+        color:transparent;
+    }
+
+    50%{
+        color:transparent;
+    }
+    55%{
+        color:white;
     }
 
     to{
         transform: rotateY(0deg);
-        background:#669171
+        background:#669171;
+        color:white;
     }
 }

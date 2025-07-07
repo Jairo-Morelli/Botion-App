@@ -1,14 +1,24 @@
 {
   "name": "level-one-capstone",
   "version": "1.0.0",
-  "main": "_script.js",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --watch index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jairo-Morelli/Botion-App.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Jairo-Morelli/Botion-App/issues"
+  },
+  "homepage": "https://github.com/Jairo-Morelli/Botion-App#readme",
   "dependencies": {
     "express": "^5.1.0"
   }

@@ -1,0 +1,220 @@
+/* 
+   green-bg: #669171; 
+   green-foreground: #7a857d;
+   grey:#343835
+   white-text:white
+*/
+
+
+html {
+    background-color: #343835;
+    opacity: 0.9;
+}
+
+.DashBoard {
+    display: flex;
+}
+
+.DashBoard.Component {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.saveIcon.Component {
+    display: flex;
+    align-self: self-start;
+    margin-left: auto;
+
+}
+
+.saveIcon.Component img {
+    width: 100px;
+    height: auto;
+
+}
+
+/* 
+    P element is purposefully hidden, and should only show up 
+    when the button is hovered over.
+*/
+.Btn.Component p {
+    color: #7a857d;
+    font-size: 10px;
+    margin-left: 50%;
+    margin-bottom: 1.0px;
+    /* visibility: hidden; I did it like this first*/
+    opacity: 0.0;
+}
+
+/* 
+    The % unit is relative the parent element
+    so in order to center my divs using the % unit 
+    I have to know what is its parent element.
+*/
+.Btn.Component {
+    margin-top: 5%;
+}
+
+.Btn.Component button {
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.0);
+    border: none;
+    margin-left: 50%;
+    width: auto;
+    height: auto;
+}
+
+.Btn.Component button img {
+    width: 40px;
+    height: auto;
+
+}
+
+.Btn.Component button:hover {
+    outline: none;
+    transform: scale(1.1);
+    background-color: #3d423e;
+}
+
+
+.BotionTeacher {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20rem;
+}
+
+/*Move the Chatbox component if you want to move 
+both the chatbox and the teacher sprites.
+
+I mean this works for now, but the reality of the situation is that
+due to my scaling issues for my text box and my text, I am not able 
+to place my images and my text whereever I want them.
+ 
+I want you to remember this situation. 
+
+This is why you usually try to learn everything right away. Because 
+you see yourself having to compromise as a weakness, and in some 
+ways it is. 
+
+but there is no possible way that you can learn everything, 
+and build the project, whilst knowing everything. 
+
+This is why you deliver this here. what you can with what you know. 
+Then later you learn how to deliver, you specific use case. 
+
+Which is how do I use css, to basically create whatever kind of 
+sprite functionality that I 
+*/
+
+/*Move the Chatbox component if you want to move 
+both the chatbox and the teacher sprites.*/
+
+.Chatbox.Component {
+    margin-right: 27em;
+    display: inline-block;
+    background-image: url('assets/chatbox.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 600px;
+    height: 600px;
+    flex-shrink: 0;
+    margin-bottom: -25em;
+}
+
+/* 
+    okay the reason that you don't chain the classes 
+    together is because when you do that you basically want 
+    some sort of similar changes done throughout all the classes
+    that contain those classes. That is when you stop.
+*/
+.text {
+    margin-left: 1.85em;
+    margin-top: 1.8em;
+    font-size: 22px;
+    font-weight: 900;
+    color: white;
+    width: 450px;
+    height: 130px;
+    z-index: 3;
+}
+
+
+.Teacher.Component {
+    display: inline-block;
+    background-image: url(assets/teacher.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 300px;
+    height: 300px;
+    flex-shrink: 0;
+}
+
+
+
+#card-testing.Card.Component{
+    width:140px;
+    height:140px;
+    padding:10px;
+    background: #669171;
+    overflow-wrap: anywhere;
+    border: 2.5px solid #0c0d0c;
+    opacity: 0.5;
+    color: white;
+    /*Learn what these values mean.
+    1. define the animation name 
+    2. define the amount of steps or intervals
+    3. define the type of animation timing 
+    */
+ 
+}
+
+/*I have to use javascript, in order to inject these into my html*/
+.anim-card-front{
+    animation: 4s steps(400) 1 forwards frontCardFlip;
+}
+/*I have to use javascript, in order to inject these into my html*/
+.anim-card-back{
+    animation: 4s steps(400) 1 forwards backCardFlip;
+}
+
+@keyframes frontCardFlip{
+   from{
+    transform: rotateY(0deg);
+    background:#669171;
+    color:white;
+   }
+   55%{
+    color:transparent;
+   }
+
+
+   to{
+    transform: rotateY(180deg);
+    background:#0eebeb;
+    color:transparent;
+
+   }
+    
+}
+
+@keyframes backCardFlip{
+    from{
+        transform: rotateY(180deg);
+        background-color: #0eebeb;
+        color:transparent;
+    }
+
+    50%{
+        color:transparent;
+    }
+    55%{
+        color:white;
+    }
+
+    to{
+        transform: rotateY(0deg);
+        background:#669171;
+        color:white;
+    }
+}

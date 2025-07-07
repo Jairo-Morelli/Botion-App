@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+.background {
+    position: fixed;
+    top: 10%;
+    left: -10px;
+    height: 75%;
+    width: 110%;
+    opacity: 0.85;
+    background-image: url("./library.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.content {
+    flex: 1;
+    max-width: 50%;
+}
+
+.content h1 {
+    font: size 3rem;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.content p {
+    font-size: 1.2rem;
+    color: white;
+    margin-bottom: 2rem;
+}

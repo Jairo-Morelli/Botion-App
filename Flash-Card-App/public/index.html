@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Daily Habit Tracker + Flash-Card Study Application</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="DashBoard">
+        <div class="DashBoard Component" id="dash">
+        </div>
+        <div class="saveIcon Component" id="saveimg">
+            <img src="assets/saveIcon.svg">
+        </div>
+    </div>
+    <div class="Btn Component">
+        <p>Add new note</p>
+        <button alt="icon" id="btnAdd">
+            <img src="assets/plusgreen.svg">
+        </button>
+    </div>
+    <div class="BotionTeacher">
+        <div class="Chatbox Component" role="img" aria-label="Icon">
+            <!--This sprite image can only really fit 30 words. so just put some conditional that 
+            
+            only allows for 30 word answers.-->
+            <p id="teacherQuestion" class="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec lacinia, massa sit amet pharetra fermentum, mauris risus sollicitudin risus, ut faucibus ante tortor non velit. Pellentesque habitant morbi tristique senectus</p>
+        </div>
+
+        <div class="Teacher Component" role="img" aria-label="Icon">
+        </div>
+    </div>
+    </div>
+    <div class="Card Component" id="card-testing">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Don</div>
+    <script src="script.js"></script>
+    <script>
+        const getQuestion = async function() {
+            dash.innerHTML = ""
+            const res = await (await fetch("/teacher-ask")).json()
+            console.log('res =', res)
+            const q = res.question;
+            teacherQuestion.innerHTML = q;
+
+            function OptionsCard(option, idx) {
+                const button = document.createElement("button");
+                button.textContent = option
+                button.onclick = async function() {
+                    console.log('option =', option)
+                    if(idx === res.answerIndex) {
+                        await alert("CORRECT")
+                        getQuestion()
+                    } else {
+                        alert("TRY AGAIN.")
+                    }
+                }
+                return button
+            }
+
+            for (let i = 0; i < res.options.length; i++) {
+                const option = res.options[i]
+                dash.appendChild(OptionsCard(option, i))
+            }
+        }
+
+        window.onload = getQuestion;
+
+
+    </script>
+</body>
+
+</html>

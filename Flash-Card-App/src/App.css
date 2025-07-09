@@ -3,11 +3,7 @@
 
 body{
   background-color:   #5b3125;
- /* background-color: #669171;
-  background-image:url("./library.png");
-  background-repeat:no-repeat;
-  background-position: center;
-  background-blend-mode: overlay;*/
+  font-family: "Montserrat";
 }
 
 #root {

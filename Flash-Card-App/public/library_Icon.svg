@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 64 64" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Building roof -->
+  <polygon points="32,4 4,16 60,16" fill="none" />
+  
+  <!-- Columns -->
+  <line x1="12" y1="16" x2="12" y2="40" />
+  <line x1="26" y1="16" x2="26" y2="40" />
+  <line x1="38" y1="16" x2="38" y2="40" />
+  <line x1="52" y1="16" x2="52" y2="40" />
+  
+  <!-- Base -->
+  <rect x="6" y="40" width="52" height="4" fill="none" />
+  
+  <!-- Books -->
+  <rect x="10" y="46" width="6" height="14" fill="white" />
+  <rect x="20" y="46" width="6" height="14" fill="white" />
+  <rect x="30" y="46" width="6" height="14" fill="white" />
+  <rect x="40" y="46" width="6" height="14" fill="white" />
+  <rect x="50" y="46" width="6" height="14" fill="white" />
+</svg>

@@ -1,26 +1,26 @@
 @import "tailwindcss";
 
+.maincontainer
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 3.5rem;
+}
+
 .background{
-    position: fixed;
-    top: 10%;
-    left: -10px;
-    height: 75%;
-    width: 110%;
-    opacity: 0.85;
-    background-image: url("./library.png");
-    min-width: 1080px;
-    min-width: 840px;
-    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    background: url("./library.png");
+    background-repeat:no-repeat;
     background-position: center;
-    background-repeat: no-repeat;
-    z-index: -1;
+    background-size: cover;
+    width: 105%;
+    height: 800px;
 }
 
-
-.content {
-    flex: 1;
-    max-width: 50%;
-}
 
 .content h1 {
     font: size 3rem;
@@ -34,20 +34,40 @@
     margin-bottom: 2rem;
 }
 
-/* rem is great for consistent, predictable sizing across your whole app*/
 
 .landingPageTitle{
     color: white;
-    font-size: 60px;
+    font-size: 82px;
+    font-weight: 700;
+    text-transform: uppercase;
     font-weight: bold;
-    margin-left: 11.5rem;
-    margin-right: auto;
-    margin-top: 37.0rem;
-    margin-bottom: 0px;
+    text-align: center;
 }
 
 .landingPageText{
     color:white;
-    margin-left: 11.5rem;
     font-size: 24px;
+    text-align: center;
+}
+
+
+
+/*Move it down*/
+.container{
+    align-self: center;
+    color: white;
+    width: 100%;
+}
+/* */
+.sectiontitle{    
+    opacity: 0.45;
+    background: linear-gradient(to top, white,#5b3125);
+    text-align: center;
+}
+
+.title{
+    color: #5b3125;
+    opacity:1.0;
+    font-size:32px;
+    margin-left: 18.5rem;
 }

@@ -17,7 +17,7 @@
     background-repeat:no-repeat;
     background-position: center;
     background-size: cover;
-    width: 105%;
+    width: 100%;
     height: 800px;
 }
 
@@ -51,23 +51,16 @@
 }
 
 
-
-/*Move it down*/
-.container{
-    align-self: center;
-    color: white;
-    width: 100%;
-}
 /* */
 .sectiontitle{    
     opacity: 0.45;
     background: linear-gradient(to top, white,#5b3125);
-    text-align: center;
 }
 
-.title{
+.featuretitle{
+    display: flex;
+    justify-content: center;
     color: #5b3125;
     opacity:1.0;
     font-size:32px;
-    margin-left: 18.5rem;
 }

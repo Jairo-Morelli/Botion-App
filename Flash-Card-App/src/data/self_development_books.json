@@ -7,7 +7,7 @@
       "year": 2018,
       "description": "A guide to building better habits and breaking bad ones with actionable strategies rooted in behavioral psychology.",
       "rating": 4.8,
-      "icon": "book"
+      "icon": "Book"
     },
     {
       "id": "sd2",
@@ -17,7 +17,7 @@
       "year": 2011,
       "description": "Explores the two systems of thinking that drive our decisions and judgments: the fast, intuitive system and the slow, deliberate system.",
       "rating": 4.5,
-      "icon": "book"
+      "icon": "Book"
     },
     {
       "id": "sd3",
@@ -27,7 +27,7 @@
       "year": 1997,
       "description": "Focuses on mindfulness and living in the present moment to achieve personal peace and clarity.",
       "rating": 4.6,
-      "icon": "book"
+      "icon": "Book"
 
     },
     {
@@ -38,7 +38,7 @@
       "year": 1946,
       "description": "A Holocaust survivor’s reflections on finding meaning in life through suffering and purpose.",
       "rating": 4.9,
-      "icon": "book"
+      "icon": "Book"
     },
     {
       "id": "sd5",
@@ -48,6 +48,6 @@
       "year": 2016,
       "description": "A guide to cultivating focus in a distracted world and producing high-quality work efficiently.",
       "rating": 4.7,
-      "icon": "book"
+      "icon": "Book"
     }
 ]

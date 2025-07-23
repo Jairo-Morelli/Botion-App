@@ -7,7 +7,7 @@
         "year": 1977,
         "description": "A family becomes isolated in a haunted hotel with terrifying consequences, as the father descends into madness.",
         "rating": 4.6,
-        "icon": "book"
+        "icon": "Book"
     },
     {
         "id": "sk2",
@@ -17,7 +17,7 @@
         "year": 1986,
         "description": "A group of childhood friends reunite as adults to confront an ancient evil that returns every 27 years.",
         "rating": 4.5,
-        "icon": "book"
+        "icon": "Book"
     },
     {
         "id": "sk3",
@@ -27,7 +27,7 @@
         "year": 1987,
         "description": "An author is held captive by a deranged fan after a car crash, leading to a psychological battle of wills.",
         "rating": 4.4,
-        "icon": "book"
+        "icon": "Book"
     },
     {
         "id": "sk4",
@@ -37,7 +37,7 @@
         "year": 1974,
         "description": "A bullied teenage girl with telekinetic powers takes revenge after a cruel prank at her high school prom.",
         "rating": 4.3,
-        "icon": "book"
+        "icon": "Book"
     },
     {
         "id": "sk5",
@@ -47,6 +47,6 @@
         "year": 2011,
         "description": "A time-traveling teacher attempts to prevent the assassination of JFK, but altering the past has consequences.",
         "rating": 4.7,
-        "icon": "book"
+        "icon": "Book"
     }
 ]

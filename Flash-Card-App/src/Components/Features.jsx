@@ -10,10 +10,10 @@ function Features({props}) {
                     <div className="col-md-10 col-md-offset-1 section-title">
                         <h1 className={styles.featuretitle}>Features</h1>
                         <div className="row">
-                            {
-                                 props.map((currentBook) => {
-                                     return <li>{currentBook.title}</li>
-                                 })
+                            { 
+                             props && Array.isArray(props) && props.map((currentBook)=>{
+                                    return <li>{currentBook.title}</li>
+                             })
                             }
                         </div>
                     </div>

@@ -1,0 +1,820 @@
+22-07-2025 Developer Notes  
+Okay so remember that you're working with React. 
+
+The main reason you're using react is because of the flexiblity and 
+power of it. 
+
+You're able to create components to your webpage or application and 
+have the UI seemingly change very rapidly. 
+
+Because you're able to store the "STATE" of that UI. That state is 
+actually incredibly modular. 
+
+const [featureIcons, setFeatureIcons] = useState(); 
+
+The useState in this case should be something like an 
+html structure or something onlong the lines of that.
+
+Okay so would you want the feature component to store 
+some state or none?. 
+
+Okay so your understanding now is a design pattern 
+component structure problem. 
+
+Which components should store state, which components 
+should only have props passed through. Etc, etc. 
+
+Now you're learning by doing, better then you where
+before.
+
+Okay so the question is how should I go at this?
+
+I really think there is no perfect way, in order for you to 
+manage state. 
+
+When you're reverse engineering you want to narrow in the thing you're 
+learning when you're reverse engineering.
+
+Notes on Props  
+
+React components use proprs to commuincate with each other. Every parent
+component can pass some information to its child components by giving them
+props. 
+
+Props might remind you of HTML attributes, but you can pass any javascript
+value through them, including objects, arrays, and functions.
+
+(when talking about props, I literally think they are calling it 
+properites, so you're passing additional properities to the 
+react function component)
+
+Familiars props  
+
+Props are the information that you pass to a JSX tag. For example, className, src, alt, width, 
+and height are some of the props you cna pass to an <img>.
+
+
+The props you can pass to an <img> tag are predefined (REACTDOM conforms to 
+the HTML standard.) 
+
+But you can pass any props to your own components, such as <Avatar>, ot customize 
+them.
+
+Passing props to a component 
+
+In this code, the profile component isn't passing any props to its cihld component, 
+Avatar: 
+
+export default function Profile(){
+    return(
+        <Avatar />
+    )
+}
+
+You can give Avatar some props in two steps. 
+
+
+export default function Profile() {
+  return (
+    <Avatar
+      person={{ name: 'Lin Lanying', imageId: '1bX5QH6' }}
+      size={100}
+    />
+  );
+}
+
+
+Read Props inside the child component 
+
+You can read these props by listing their names person, size separated by the 
+commmans inside ({ and }) directly after function Avatar. This lets you use them 
+inside the Avatar code, like you would with a variable.
+
+function Avatar({ person, size }) {
+  // person and size are available here
+}
+
+Props let you think about parent and child components independently. For exmaple,
+you can change the person or the size props inside profile without having
+to think about how Avatar use them. SImiarrly, you can change how the Avatar uses these 
+props, without looking at the Profile.
+
+Don't miss the pair of { and } curiles inside of ( and ) when declaring
+props: 
+
+function Avatar ({person, size }){
+    // ... 
+}
+
+This syntax is called "destructuring" and is equivalent to reading properties from 
+a function parameter:
+
+function Avatar(props){
+    let person = props.person;
+    let size = props.size;
+}
+
+Speciying a default value for a prop
+
+If you want to give a prop a default value to a fall back on when no value is 
+specificed, you can do with destructuring by putting = and the default valuer
+right after the parameter: 
+
+function Avatar({person, size = 100}){
+// ...
+}
+
+
+Now, if <Avatar person={...} is rendered with no size prop, the size wil be 
+set to 100.
+
+Fowarding props with the JSX spread syntax 
+
+function Profile({person,size,isSepia, thickBorder}){
+    return(
+        <div className="card"> 
+            <Avatar 
+                person={person}
+                size={size}
+                isSepia={isSepia}
+                thickBorder={thickBorder}
+                />
+        </div>
+    );
+}
+
+
+There's nothing wrong with repetitive code - it can be more legible. BUt at times 
+you may value consciseness. Some components forward all of their props to their children,
+like how this Profile does with Avatar. Because they don't use any of their props directly,
+it can make sense to use a more consise "spread" syntax:
+
+function Profile(props){
+return (
+    <div className="card">
+        <Avatar {...props} />
+    </div>
+);
+}
+
+This forwards all the Profile's props to the Avatar without listing each of 
+their names. 
+
+Use the spread syntax with restraint. IF you're using it in every other component,
+something is wrong. Often, it indicates that you should split your components and pass
+children as JSX. 
+
+Passing JSX as Children
+
+<Card>
+  <Avatar />
+</Card>
+
+When you nest content inside a JSX tag, the parent component will recieve that content 
+in a prop called children. For example, the Card component will receive a children prop 
+set to <Avatar /> and render it in a wrapper div:
+
+function Card({ children }) {
+  return (
+    <div className="card">
+      {children}
+    </div>
+  );
+}
+
+export default function Profile() {
+  return (
+    <Card>
+      <Avatar
+        size={100}
+        person={{ 
+          name: 'Katsuko Saruhashi',
+          imageId: 'YfeOqp2'
+        }}
+      />
+    </Card>
+  );
+}
+
+
+Try replacing the <Avatar> inside <card, with some text to see how the Card 
+component can wrap any nested content. It doesn't need to "know" what's being rendered
+inside of it. YOu will see this flexible pattern in many places.
+
+
+You can think of a component with a children prop as having a "hole" that can be 
+"filled in" by its parent components with arbitrary JSX. You will often use the children prop for visual wrappers:
+panels, grids, etc.
+
+This example illustrates that a component may receive different props over time.
+Props are not always static! Here, the time prop changes every second, and the color prop
+changes when you select another colour. Props reflect a component's data at any point in time, 
+rather than only in the beginning.
+
+However, props are immutable. When a component needs to change its props(for exmaple, in resposne to a user 
+interaction or new data), it will have to "ask" its parent component to pass it different
+props = a new object! Its old props will then be cast aside, and eventually the JavaScript 
+engine will reclaim the memory taken by them.
+
+Don't try to "change props". When you need to respond to the user input(like changing the selected colour),
+you will need to "set state", which you can learn about in State:A Component's Memory.
+
+Recap 
+
+- To pass props, add them to the JSX, just like you would with HTML attributes.
+- To read props, use the function Avatar ({person, size }) desturcturing syntax.
+- You can specify a default value like size = 100, which is used for missing and undefined props.
+- You can forward all props with <Avatar {...props} /> JSX spread syntax, but don't overuse it! 
+- Nested JSX like <Card><Avatar /></Card> will apear as a Card Component's cihdlren prop.
+- Props are read-only snapshots in time, every render receives a new version of props.
+- You ccan't change props. When you need interactivity, you'll need to set state.
+
+
+TailWind Core Concepts 
+
+Styling with Utility Classes 
+
+building complex components from a constrained set of primitive utilities. 
+
+Overview 
+You style things with Tailwind by combining many single-purpose persentational Classes
+(utility classes) directly in your markup: 
+
+<div class="mx-auto flex max-w-sm items-center gap-x-4 rounded-xl bg-white p-6 shadow-lg outline outline-black/5 dark:bg-slate-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10">
+  <img class="size-12 shrink-0" src="/img/logo.svg" alt="ChitChat Logo" />
+  <div>
+    <div class="text-xl font-medium text-black dark:text-white">ChitChat</div>
+    <p class="text-gray-500 dark:text-gray-400">You have a new message!</p>
+  </div>
+</div>
+
+
+For example, in the UI above we've used:
+
+- The display and padding utilities (flex, shrink-0, and p-6) to control the overall layout
+
+- The max-width and margin utilities (max-w-sm and mx-auto) to constrain the card width and center it horizontally
+
+- The background-color, border-radius, and box-shadow utilities (bg-white, rounded-xl, and shadow-lg) to style the card's appearance
+
+- The width and height utilities (size-12) to set the width and height of the logo image
+
+- The gap utilities (gap-x-4) to handle the spacing between the logo and the text
+
+- The font-size, color, and font-weight utilities (text-xl, text-black, font-medium, etc.) to style the card text
+
+Styling things this way contradicts a lot of traditional best practices, ut once you try it 
+you'll quickly notice some really important benefits: 
+
+- You get things done faster — you don't spend any time coming up with class names, making decisions about selectors, or switching between HTML and CSS files, so your designs come together very fast.
+
+- Making changes feels safer — adding or removing a utility class to an element only ever affects that element, so you never have to worry about accidentally breaking something another page that's using the same CSS.
+
+- Maintaining old projects is easier — changing something just means finding that element in your project and changing the classes, not trying to remember how all of that custom CSS works that you haven't touched in six months.
+
+- Your code is more portable — since both the structure and styling live in the same place, you can easily copy and paste entire chunks of UI around, even between different projects.
+
+- Your CSS stops growing — since utility classes are so reusable, your CSS doesn't continue to grow linearly with every new feature you add to a project.
+
+Why not just use inline styles? 
+
+A common reaction to this approach is wondering, "isn't just inline styles"? and in some 
+ways it is - you're applying styles directly to elements instead of assigning them a classes
+name and then styling that class.
+
+But using utility calsses has many important advantages over inline styles, for example: 
+
+- Designing with constraints 
+- Hover, focus, and other states 
+- Media queries
+
+
+Dark mode 
+
+Using variants to style your site in dark mode. 
+
+Overview 
+
+Now that dark mode is a first class feature of many operating systems, it's becoming
+more and more common to design a dark version of your website to go alnog with the default 
+design.
+
+To make this as easy as possible, Tailwind incldues `dark` variant that lets you style your site 
+differently when dark mode is enabled.
+
+Responsive Design 
+
+Using Responsive utility variants to build adapative user interfaces. 
+
+Every utlility class in Tailwind can be applied conditionally at different breakpoints, 
+which makes it a piece of cake to build compolex responsive interfaces without ever leaving 
+your HTML. 
+
+First, make sure you've added the viewport meta tag to the `<head`> of your document: 
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+Then to add a utility but only have it take effect at a certain breakpoint, all 
+you need to do is prefix the utlitity with the breakpoint name, followed by the `:` character: 
+
+<!-- Width of 16 by default, 32 on medium screens, and 48 on large screens -->
+<img class="w-16 md:w-32 lg:w-48" src="..." />
+
+There are five breakpoints by default, inspired by common device resolutions:
+
+Breakpoint prefix	Minimum width	CSS
+sm	40rem (640px)	@media (width >= 40rem) { ... }
+md	48rem (768px)	@media (width >= 48rem) { ... }
+lg	64rem (1024px)	@media (width >= 64rem) { ... }
+xl	80rem (1280px)	@media (width >= 80rem) { ... }
+2xl	96rem (1536px)	@media (width >= 96rem) { ... }
+
+This works for every utility class in the framework, which means you can change 
+literally anything at a give breakpoint -even things like letter spacing or cursor
+styles. 
+
+Tailwind uses a mobile-first breakpoint system, similar to what you might be 
+used to int other frameworks like Bootstrap. 
+
+What this means is that unprefixed utilies (like `uppercase`) take effect on all 
+screen sizes, while prefixed utilities (like `md:uppercase) only take specificed breakpoint
+and above.
+
+Targeting mobile screens 
+
+Where this approach surprises people most often is that to style something
+for mobile, you need to use the unprefixed version of a utility, not the `sm:` prefixed version. 
+Don't think of `sm:` as meaning "on small screens", think of it as "at the small breakpoint".
+
+<!-- This will only center text on screens 640px and wider, not on small screens -->
+<div class="sm:text-center"></div>
+
+Use prefiexed utilities to target mobile, and override them at larger breakpoints 
+
+<!-- This will center text on mobile, and left align it on screens 640px and wider -->
+<div class="text-center sm:text-left"></div>
+
+For this reason, it's often a good idea to implement the mobile layout for a design 
+first, then layer on any changes that make sense for `sm` screens, followed by `md` screens, etc. 
+
+Targeting a breakpoint range 
+
+By default, styles applied by rules like `md:flex` will apply at the breakpoint and 
+stay applied at larger breakpoints. 
+
+If you'd like to apply a utility only when a speciic breakpoint range is active, stack a 
+responsive variant like `md` with a `max-*` variant to limit that style to a specific range: 
+
+<div class="md:max-x1:flex">
+    <!-- ... --> 
+</div> 
+
+tailwind generates a corresponding `max-*` variant for each breakpoint, so out of the box,
+the following variants are avaliable: 
+
+
+Variant	Media query
+max-sm	@media (width < 40rem) { ... }
+max-md	@media (width < 48rem) { ... }
+max-lg	@media (width < 64rem) { ... }
+max-xl	@media (width < 80rem) { ... }
+max-2xl	@media (width < 96rem) { ... }
+
+
+Targeting a single breakpoint 
+
+To target a single breakpoint, target the range for that breakpoint by stacking
+a responsive variant like `md` with the `max-*` variant for the next breakpoint: 
+
+
+<div class="md:max-lg:flex">
+  <!-- ... -->
+</div>
+
+Using arbitrary values 
+
+if you need to use a one-off breakpoint that doesn't make sense to include in your them,e
+use the `min` to `max` variants to generat a custom breakpoint on the fly using any arbitrary
+value. 
+<div class="max-[600px]:bg-sky-300 min-[320px]:text-center">
+  <!-- ... -->
+</div>
+
+What are container queries? 
+
+Container queries are a modern CSS feature that let you style something based on 
+the size of a parent element instead of the size of the entire viewport. They let you 
+build components that are a lot more portable and reusable because tehy can change based 
+on the actual space available for that component.
+
+Basic example 
+
+Use the `@container` class to mark an element as a container, then use variants 
+like `@sm` and `@md` to style child elements based on the size of the container: 
+
+<div class="@container">
+  <div class="flex flex-col @md:flex-row">
+    <!-- ... -->
+  </div>
+</div>
+
+Just like breakpoint variants, container queries are mobile-first in Tailwind 
+CSS and apply at the target container size and up.
+
+Max-width container queries
+
+Use variants like `@max-sm` and `@max-md` to apply a style below a specific
+container size:
+
+<div class="@container">
+  <div class="flex flex-row @max-md:flex-col">
+    <!-- ... -->
+  </div>
+</div>
+
+Container query ranges 
+
+Stack a regular container query variant with a max-width container query 
+variant to target a specific range:
+
+<div class="@container">
+  <div class="flex flex-row @sm:@max-md:flex-col">
+    <!-- ... -->
+  </div>
+</div>
+
+Named containers 
+
+For complex designs that use multiple nested containers, you can name 
+containers using `@container/{name}` and target specific containers with variants like `sm/{name}` and 
+`@md/{name}`: 
+
+<div class="@container/main">
+  <!-- ... -->
+  <div class="flex flex-row @sm/main:flex-col">
+    <!-- ... -->
+  </div>
+</div>
+
+This makes it possible to style something based on the size of a distant container, 
+rather than just the nearest container.
+
+
+Theme Variables 
+
+Using utility classes as an API for your deisgn tokens. 
+
+Tailwind is a framwork for buildign custom designs, and different designs need 
+different typography, colours, shadows, breakpoints, and more. 
+
+These low-level design decisions are often called design tokens, and in Tailwind
+projects you store those values in theme variables. 
+
+What are theme variables? 
+
+Theme variables are special variables defined using the `@Theme~ directive 
+that influence which utility classes exist in your project.
+
+For example, you can add a new colour to your project by defining a theme variables 
+` --color-mint-500:` 
+
+@import "tailwindcss";
+
+@theme {
+  --color-mint-500: oklch(0.72 0.11 178);
+
+}
+
+Now you can use utility classes like `bg-mint-500`, `text-mint-500`, or `fill-mint-500`
+
+<div class="bg-mint-500">
+  <!-- ... -->
+</div>
+
+Colors 
+
+USing and customizing the color palette in Tailwind CSS projects
+
+Every color in the default palette inlcudes 11 steps, with 50 being the lightest, 
+and 950 being the darkest: 
+
+<div>
+  <div class="bg-sky-50"></div>
+  <div class="bg-sky-100"></div>
+  <div class="bg-sky-200"></div>
+  <div class="bg-sky-300"></div>
+  <div class="bg-sky-400"></div>
+  <div class="bg-sky-500"></div>
+  <div class="bg-sky-600"></div>
+  <div class="bg-sky-700"></div>
+  <div class="bg-sky-800"></div>
+  <div class="bg-sky-900"></div>
+  <div class="bg-sky-950"></div>
+</div>
+
+Adding custom styles 
+
+Best practices for adding your own custom styles in Tailwind projects 
+
+Often the biggest challenge when working with a framework is figuring out what 
+you're suppose to do when there's something you need that the framework doesn't handle 
+for you. 
+
+Tailwind has been designed from the ground up to be extensible and customizable, so that no 
+matter what you're build you never feel like you're fighting the framework. 
+
+This guide covers topics like customizign your deisgn tokens, how to break out of those
+constraints when necessary, adding your own custom CSS, and extending the framework with 
+plugins.
+
+
+Detecting Classes in source files
+
+Understanding and customizing how Tailwind scans your source files. 
+
+
+Overview 
+
+Tailwind works by scanning your project for utility classes, then generating all 
+of the necessary CSS based on the classes you've actually used. 
+
+This make sure your CSS is a small as possible, and is also waht makes features like 
+arbitrary value possible.
+
+How classes are detected 
+
+Tailwind treats all of your source files as plain text, and doesn't attempt to 
+actually parse your files as code in anyway. 
+
+Instead it just looks for any tokens in your file that could be classe s based 
+on which characters Tailwind is expecting in class name: 
+
+export function Button({ color, children }) {
+  const colors = {
+    black: "bg-black text-white",
+    blue: "bg-blue-500 text-white",
+    white: "bg-white text-black",
+  };
+  return (
+    <button className={`${colors[color]} rounded-full px-2 py-1.5 font-sans text-sm/6 font-medium shadow`}>
+      {children}
+    </button>
+  );
+}
+
+Then it tries to generate the CSS or all of these tokens, throwing any tokens that don't 
+map to a utility class the framework knows about.
+
+
+Dynamic class names 
+
+Since Tailwind scans your source files as plain text, it has no way of 
+understanding string concatenation or interpolation in the programming lanaguage you're 
+using.
+
+<div class="text-{{ error ? 'red' : 'green' }}-600"></div>
+
+
+Alway use complete class names 
+
+<div class="{{ error ? 'text-red-600' : 'text-green-600' }}"></div>
+
+Always map props to static class names
+
+unction Button({ color, children }) {
+  const colorVariants = {
+    blue: "bg-blue-600 hover:bg-blue-500",
+    red: "bg-red-600 hover:bg-red-500",
+  };
+  return <button className={`${colorVariants[color]} ...`}>{children}</button>;
+}
+
+As long as you always use complete class names in your code, tailwind
+will generate all of your CSS perfectly everytime.
+
+Which files are scanned 
+
+Tailwind will scan every file in your project for class names, 
+expect in the following cases: 
+
+- Files that are in your .gitignore file
+
+- Files in the node_modules directory
+
+- Binary files like images, videos, or zip files
+
+- CSS files
+
+- Common package manager lock files
+
+If you need to scan any files that Tailwind is ignoring by 
+default, you can explicitly register those sources.
+
+Personal note
+
+The focus should definitely be centered around using tailwind CSS 
+grid and flex in combination with general react, passing props and using 
+states.
+
+Lets put in some changeable square data.
+
+Okay here is the thing now. What you need to learn 
+
+is how to iterate through your .json properly whilst printing
+the things saved in that .json file.
+
+Okay so you don't understand map, so learn it duh.4
+
+
+Notes on map() method of Array instances create a new array 
+populated with the reuslts of calling a provided functino on every 
+element in the calling array.
+
+const array = [1, 4, 9, 16];
+
+// Pass a function to map
+const mapped = array.map((x) => x * 2);
+
+console.log(mapped);
+// Expected output: Array [2, 8, 18, 32]
+
+
+Parameters 
+
+callbackFn 
+
+A function to exectue for each elemetn in the array. Its return value 
+is added as a single element in the new array. The function is called 
+with the following arguments: 
+
+  element:
+  The current element being processed in the array. 
+
+  index: 
+  The index of the current element being processed in the array.
+
+  array 
+  The array map() was called upon. 
+
+  ThisArg 
+    A value to use as this wehn executing callbackFn.
+
+  Developer Notes 23-07-2025
+
+  Tailwind CSS Notes 
+
+  Utilities for controlling the direction of flex items. 
+
+  flex-row    flex-direction: row;
+
+  flex-row-reverse  flex-direction: row-reverse;
+
+  flex-col      flex-direction: column;
+
+  Personal Notes 
+
+  I need to be able to print out a section of jsx
+
+
+Why does <li> have a key prop? 
+
+ - The key prop is not actually passed to the DOM. 
+ - It is used interanlly by React to help it identify elemetns in a lsit and efficiently update
+ only the change ones.
+
+Examples 
+{books.map((book, i) => (
+  <li key={i}>{book.title}</li>
+))}
+
+
+Tailwind & Personal Notes 
+
+You should use max-width and max-height for keeping the size of your books Icons 
+a certain consistent size. 
+
+Personal Notes 
+
+The things I think you should incoperate from the example that you're using.
+
+- About Us
+- Our Services 
+- Gallery  
+- Get In Touch
+- Footer
+
+
+Developer Notes 24-07-2025 
+
+
+- Have the feature bar, print titles from an external API 
+
+
+Notes on Axios 
+
+Axios is a promise-based HTTP Client for node.js and the browser. it is 
+isomorphic( = it can run in the broswer and nodejs with the same codebase). 
+On the server-side it uses the native node.js http module, while on the 
+client (browser) it uses XMLHtppRequests. 
+
+
+Features 
+
+- Make XMLHttpRequests from the browser 
+- Make htpp requests from node.js 
+- Supports the Promise API 
+- Intercept request and response 
+- Transform request and response data 
+- Cancel request 
+- Timeouts 
+- Query parameters serialization with support for nested entries
+- Automatic request body serialization to: 
+  - JSON (applictaion/json)
+  - Mutlipart/ formData (mutlipart/form-data)
+  - URL encoded from (application/x-www-form-urlencoded)
+- Posting HTML forms as JSON 
+- Automatic JSON data hadnling in respone 
+- Progress capturing for browsers and node.js with extra info (speed rate,
+remaining time)
+- Setting bandwidth limits for node.js 
+- Compatible with spec-compliant FormData and Blob (including node.js)
+- Client side support protecting against XSRF 
+
+
+HTTP request methods 
+
+HTTP defines a set of request methods to indicate the purpose of the request
+and what is expected if the request is successful. Although they 
+can also be nouns, these request methods are sometimes referred to as 
+HTTPS verbs. Each request mehtod has its own semantics, but some 
+characteristics are shared across mutliple methods, specifically request
+methods can be safe, idempotent, or cacheable.
+
+Idempotent 
+
+An HTTP method is idempotent if the intended effect on the 
+server of making a single request is the same as the effect of making 
+several identical request. 
+
+
+GET 
+  The Get method requests a respresentation of teh specified 
+  resource. Reqeuests using GEt should only retrieve data and should
+  not contain a request content. 
+
+HEAD 
+The HEAD method asks for a repsonse identical to a GET request, 
+but without a response body. 
+
+POST 
+The Post method submits an entity to the specified resource,
+often causing a change in state or side effects on the server. 
+
+PUT 
+The PUT method replaces all current representations of the target 
+resource with the request content. 
+
+DELETE 
+The DELETE method deletes the specified resource. 
+
+CONNECT 
+The CONNECT method establishes a tunne lto the server identified 
+by the target resource.
+
+OPTIONS 
+The OPTIONS method describes the communication options for the 
+target resource. 
+
+TRACE 
+The TRACE method perofrms a message loop-back test along the 
+path to the target resource. 
+
+PATCH 
+The PATCH method applies partial modifications to a resource.  
+
+Personal Note 
+
+Your study application is going to need a search bar.
+
+You study application part, that you created with pure html, css and javascript 
+is going to be the study part of the game.
+
+Notes on 
+
+API service layer, data access layer, or part of the repository pattern. It 
+doesn't always ahve a flashy name in fron end development, but it absolutely is a studied and 
+recommended practice especially as apps scale.
+
+API Service Layer (Frontend Architecture)
+ - Separates API logic from UI logic 
+ - Keeps code modualr, testable, and resuable 
+ - Common in React, Angular, Vue, etc. 
+
+Respository Patterns 
+  - Often used in backend, but gaining use in frontend 
+  - Abstracts the data source (could be REST, GraphQL, localStorage, etc.)
+  - Allows you to change how you fetch data without touching the components 
+
+  Separation of Concerns (SoC)
+  - Fundamental software architecture princples 
+  - Keep UI, data, and logic in separate modules

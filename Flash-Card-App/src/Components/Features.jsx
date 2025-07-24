@@ -20,7 +20,7 @@ function Features({ props }) {
                                             (
                                                 <>
                                                     <div className="flex flex-col justify-center md:max-w-m max-h-sm">
-                                                        <img className="size-49" src={`../../public/${currentBook.icon}.svg`} />
+                                                        <img className="size-49" src={`/assets/${currentBook.icon}.svg`} />
                                                         <p className="text-base">{currentBook.title}</p>
                                                     </div>
                                                 </>

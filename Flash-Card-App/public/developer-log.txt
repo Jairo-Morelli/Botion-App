@@ -1,0 +1,1704 @@
+ Guide to making my code easier to work on. 
+
+ Basic I am working in javascript, and I can't really separate the functionality into several 
+ different .js files, without using node.  
+
+ So the question is what do I do? 
+
+ Basically I am creating a map, in order to understand where exactly I should be working on, what is were, 
+
+ so I don't have to scroll up and down, to write a piece of code somewhere just to write it somewhere else. 
+
+
+
+This map will have a visual representation, as well as number lines to make it easier for me.
+
+
+I am assuming that, if I know what pieces I am working on, when I am working on them, 
+then development will be easier.
+
+2-06-2025 Log 
+
+OKAY SO NEW WAY DOING THIS. 
+
+I originally thought having a map would make all of this easier. Where I would have this 
+guide, serve me as a document to traverse my code base. 
+
+Basically let me explain my problem. 
+
+The reason I am writing this document, is simply because I am struggling to work on my 
+code base. Because as of June the 2nd of 2025, this code base is 600+ lines of code. 
+
+I am not mentally able to retain, what I am working on, and I have to constantly test,
+scroll up and down to understand where and what I am working on.
+
+SO, 
+
+my solution, is a two part solution. 
+
+THE FIRST PART IS, 
+
+I am going to document the pieces of my code, over here, and not so much in my 
+.js script because I feel like I heavily comment things, and it actually makes 
+the code less inteligable at first glance.  
+
+This document is a reason for me to start documenting everything. But I will 
+try to maintian the same amount of comments I put in my .js script in here.
+
+The structure of my documentation will be simple 
+
+DATE 
+TOPIC 
+DETAILS 
+
+that is it.  
+
+
+SECOND PART 
+
+Haven't decided for the most part, exactly how I am going to do this. But fundamentally, 
+how I am going to maintain decent progress in my ever growing code base, is I am going to 
+completely forget the overall mental map of my program. 
+
+Whatever, however it is at the moment I am writing the code that I am writing, is my 
+existing web application. EXCEPT, for the parts that I am working on.  
+
+I know this alreadly sounds intuitive, but I am either going to write down the 
+LITERALLY JAVASCRIPT code in my journal, whilst I am building the feature that 
+is associated with the said javascript code. 
+
+OR 
+
+it will be written in comments in some capacity in my .js script, as well documented 
+in some capacity here as well.
+
+
+02-06-2025 Developer Log 
+Botion App map 
+
+/*Custom Javscript event code*/
+line 8 - 24 these are custom event definitions  
+/*Custom Javscript event code*/
+
+/*Class definitions*/
+line 29 - 363 these are the class definitions
+/*Class definitions*/
+
+
+/* Event Handlers */
+line 442 - 588 these are the specific event handlers.  
+/* Event Handlers */
+
+/*Global variables*/
+line 601-606 these are global variables that exist to instantiate my web application.
+*/Global variables*/
+
+/*Mediator Custom Event definitions*/
+line 611-639 these are custom event defintions, that are defined for the mediator object 
+I am using.
+
+/* Mediator Custom Event enabling */
+line 645-655 these are the mediator's custom event enabling. 
+/* Mediator Custom Event enabling */
+
+/*Application Code */
+line 661-677 this is the piece of code that starts my application.
+
+
+Okay I am currently having a problem of implementing my "seralizer" for my application. 
+The question, is how am I going to make it so that I can't work consistently without getting 
+exhausted of scrolling up and down throughout my code?
+
+The reason I am scrolling up and down, is mainly how I've built my application.
+
+Okay so I am currently trying to implement seralization using my application's 
+datatypes, and architecture.
+
+
+- BotionAppEventData
+- Mediator 
+- Component.receive()
+- Component.updateComponent()
+- CardManager.updateComponent()
+- StyleManager.updateComponent()
+- applicationReadHandler()
+- applicationWriterHandler()
+
+
+What is the expect functionality that I am trying to build first off? 
+
+I want my cards to either be saved, once I've clicked to add a button. 
+
+After this, I expect to easily write seralization code.
+
+Now after stating on the functionality that I want to get, I really only 
+need to focus on these components 
+
+-BotionAppEventData
+-CardManager.updateComponent(message)
+    - in your message variable, you're passing in 
+    a text value of state, with your BotionAppEventData
+-applicationReadHandler()
+-applicationWriterHandler() 
+
+I do want to make note of a particular design choice. You're not using 
+any state object of any kind. You're really just passing a string that 
+represents a state, through your BotionAppEventData variable. 
+
+
+please I don't care how bad, you want to create a state class, do not. 
+it isn't necessary and the application literally doesn't need it. You're 
+creating a lot of tech debt in the future.
+
+what kind of state do you want to exist within the switch cases? 
+
+"save" 
+
+default 
+
+
+what objects need to be saved, using the mediator event system?
+
+
+StyleManager 
+CardManager
+BotionMemory
+
+I can access all information that needs to be saved, if that information 
+is inside a manager class. 
+
+I don't need to separate my saving functionality to all objects, persay.
+
+what needs to be saved mainly? 
+
+The cards, what is written in the card 
+
+How am I going to write back using my saved information? 
+
+I can save everything in one place, but regardless I literally am going to 
+have to write to everything else individually.
+
+what happens after the setup, I create a piece of code, that will essentially 
+build my application for me. 
+
+not that I wrote a piece of code, that will build something. 
+
+but a piece of code, that will accept my written saved information and then
+proceed to build my application for me.
+
+How would I give deseralized data to my cardManager class? 
+
+maybe not every object needs to save to itself, but maybe every class 
+can write to itself.
+
+I don't even need to desarlized all of cardManagers member variables, becaues 
+the scope of deseralization doesn't involve "Development Data". I only really 
+care about the running applications information. 
+
+which in this case is #cardsArray= [];
+
+Developer log 3-06-2025 
+
+Okay so I thought that my botionMemory object, will be the only class with a read and write 
+state.
+
+So 
+
+BotionMemory.update_component()
+{
+    switch(state)
+    {
+        case READ:
+        {
+            break;
+        }
+        case WRITE:
+        {
+            break;
+        }
+    }
+}
+
+but I am quickly seeing, that even though botionMemory is going to be writing all the data 
+to local storage. 
+
+My objects member variables that are being, seralized, need a read state so, that 
+when component_update() is being called, that state will write to botionMemory. 
+
+honestly a class like cardmanager might even have an execute switch case state.
+
+But I know for sure that all classes, are going to have 
+
+.update_component()
+{
+    switch(state)
+    {
+        case READ:
+        {
+            break;
+        }
+        case WRITE:
+        {
+            break;
+        }
+    }
+}
+
+for styleManager.update_component(), cardManager.update_component() it is going to be:
+
+.update_component()
+{
+    switch(state)
+    {
+        /*READ 
+            The READ statement isn't for the managers themselves, it is actually for 
+            botionMemory, to read the current vaild member variables they have.
+        */
+        case READ:
+        {
+            break;
+        }
+        /*WRITE
+            The write statement is actually for the managers themsleves, using botionMemory
+            classes, de-seralization process. 
+        */
+        case WRTIE:
+        {
+            break;
+        }
+    }
+}
+
+for botionMemory.update_component() is going to be:
+.update_component()
+{
+    switch(state)
+    {
+        /*READ 
+            The READ statement is going to read all the "valid" seralizable objects 
+            in my botion application. and then probably call write, right after in order 
+            to seralize, the information into local storage.
+        */
+        case READ:
+        {
+            break;
+        }
+        /*WRITE
+            The write statement is probably going to be called immediately after the read 
+            switch case statement has finished executing. To seralize my information
+        */
+        case WRTIE:
+        {
+            break;
+        }
+    }
+}
+
+
+
+botionMemory read and write state are focused mainly on writing to local storage. 
+
+cardManager and stylemanager read and write states are mainly focus on going to botionMemory
+to get there saved data, and placing it into themsleves respectively.
+
+they are still decoupled.
+
+okay so these are the important pieces of code.
+
+-applicationReadHandler()
+-applicationWriteHandler() 
+-StyleManager.update_component()
+-CardManager.update_component()
+-BotionAppEventData
+-mediator
+-let saveInterval = setInterval(applicationWriteHandler, 150000) // Calls every 2.5 seconds
+
+
+Order of execution, of pieces of code that I am going to work on.
+
+variables:
+BotionAppEventData.state="";
+-----
+1. let saveInternal = setInterval(applicationWriteHandler, 150000) // Calls application save handler
+every 2.5 seconds. 
+
+2. applicationWriteHandler(data_)
+    - no need to pass botionAppEventData, inside parameter, only in function.
+
+3. Inside applicationWriteHandler StyleManager.update_component(data_)
+    ,CardManager.update_component(data_)
+
+        -doesn't matter how you call these guys. 
+        -In here you seralize the respective data. 
+
+4. After finishing execution of applicationWriteHandler call, applicationReadhandler   
+    -
+ ^^^ 
+ don't even need to call applicationReadHandler() after the write.     
+
+noticing now, the application and the objects themsleves have their own respective write 
+and read process.
+
+because when I write(seralize) my objects, I have written the information to local storage.
+
+so when do I need to call read? Only when my application "starts".
+
+okay so this is the next pieces of important code write here.
+
+variables: 
+BotionAppEventData 
+meditor
+-----
+
+1. let saveInternal = setInterval(applicationWriteHandler,150000)
+2. applicationWriteHandler()
+    - call botionMemory.update_Component() using the meditor class you have.
+    - just assume to use the meditor class, if I mention .update_component(), 
+    because I intented it to be designed that way. 
+
+3. inside botionMemory.update_Component(), call styleManager and CardManager
+    - doesn't matter what order you call them in.
+    - make sure you set up both switch case states of "WRITE" and "READ" in 
+    botionMemory.update_Component(), StyleManager.update_Component() and CardManager.update_Component()
+
+4. Now actually write the functionality of botionMemory.update_Component()'s "WRITE" 
+switch case statements 
+    -As well as StyleManager.update_Component() and CardManager.update_Component()
+    - these WRITE functionalities will all include you putting in relevent data into 
+    local storage. 
+    
+
+What is the expected outcome? 
+
+the outcome I expect, is that my application actually stores the information into local
+storage.
+
+Just some extra stuff, 
+
+how are you planning to save this data?
+
+having a json object that gets deseralized.
+
+when does it get created?
+
+Honestly I think I should just seralize my BotionAppEventData. 
+
+Whatever I am seralizing, it kind of needs to have it's respective JSON object, 
+and that respective JSON object, needs to be in some sort of alignment when I call 
+my read's. To make it easier for everyone.
+
+I don't think I need to think about this too hard right now. 
+
+How I am planning to save my application information is all in one json, 
+
+within that one json object, is made up of smaller json objects. 
+
+I want to ceate something similar to this.
+
+{
+    "BotionData": [
+        {
+            "cardData": [
+                {
+                    "title": "card-title-example: Feburary 2005 9:00pm",
+                    "text": "Today I ate three bags of chips, when to the doctors and was told that my diet is unhealthy."
+                }
+            ],
+            "HabitData":[
+                {
+                    "title": "Running",
+                    "text": "I ran alot"
+                }
+            ]
+        }
+    ]
+}
+
+I think what I was going to do was access the cardmanager and style member variables
+in my botionMemory.update_Component function directly and save them, in JSON format.
+
+Developer Update 03-06-2025 16:42 
+
+I've ran into a problem. Basically, in order to me to properly serialize and deseralize 
+my information I need to create my own serilaizer and de-serializer. The main functionality 
+I need is the abiltiy to have pointers to my objects. Creating a tree graph node.
+
+Adding in a seralizer class, that seralizes and deseralizes.
+
+The serializer can be inside botionMemory class, because I doesn't necessarily 
+work outside of that class naturally. botionMemory class is suppose to handle 
+physically the reading and the writing.  
+
+if I put the seralization logic inside of botioMemory, it is going to make that class bloated. 
+If I create a serializer class, it can handle that functionality and make my code more consistent 
+and clean. 
+
+I don't need to make BotionSerializer a static singleton class, because it doesn't really 
+make senes for it to work outside of botionMemory class.
+
+the botionSeralizer is suppose to solve certain specific problems.
+
+the main problem is giving the JSON.parse and JSON.stringify options 
+more functionality because, JSON only handles primitive types.
+
+class BotionSerializer()
+{
+    constructor()
+    {
+
+    }
+    #BotionJSON // base botionApplicationJSON file
+}
+
+these are the problems I am trying to deal with specifically
+
+[{"isSelected":false,"hasChanged":false,"htmlref":{},"state":"idle","cardText":""},
+{"isSelected":false,"hasChanged":false,"htmlref":{},"state":"idle","cardText":""}]
+
+issue 1:
+this is how JSON will save an array of card objects. It isn't intutive or 
+written in string what TYPE of object has these member variables. 
+
+I want to save this into local storage
+
+"card0": [
+                {
+                    "isSelected": false,
+                    "hasChanged":false,
+                    "htmlref":{pointertohtmlref},
+                    "state":"idle",
+                    "cardText":"example text",
+                }
+            ],
+"card1": [
+                {
+                    "isSelected": false,
+                    "hasChanged":false,
+                    "htmlref":{pointertohtmlref},
+                    "state":"idle",
+                    "cardText":"example text",
+                }
+            ],
+
+not this 
+
+[{"isSelected":false,"hasChanged":false,"htmlref":{},"state":"idle","cardText":""},
+{"isSelected":false,"hasChanged":false,"htmlref":{},"state":"idle","cardText":""}]
+
+issue 2: 
+htmlref, is an html object/pointer, that is vital to my application and it
+isn't saving the information.
+
+How do I resolve this issue? 
+
+Simply, you need to create a seralizer, that actually retains 
+
+1. object type 
+2. and some type of ability to properly point to the object, that you're 
+trying to access, in browser memory.
+
+Before you start writting the class you actually need to see if you're able 
+to save "pointer/object" type information into your localstorage.
+
+All right so there are plenty of ways I can seralize my my Card class
+
+I can create a abritary string value, and have that in my BotionApplication JSON 
+and that more or less will carry the logic that I want. 
+
+but I want to know if there is a way I can seralize, the information in a more 
+pointer type of fashion plus. 
+
+look to see if it is possible for you to simply just stringify everything, that you 
+want to seralize.
+
+by the way does it really matter what type my seralized information is, if when I 
+deseralize that information and store it in a JSON object, it actually recongizes 
+the type it is?
+
+because you can associate the type simply by machine the members variables in a sense.
+
+Developer Log 6-04-2025 
+
+Okay after testing without how JSON.parse and stringfy work, I am stuck with a certain design choice.
+
+basically JSON.parse and stringfy don't give me the full functionality I want. 
+
+I want to save objects in JSON format like 
+
+{
+    "objectContainer":
+    [
+        {
+            "object0":
+            [
+                {
+                    "value0":1,
+                    "value1":400
+                }
+            ],
+            "object1:
+            [
+                {
+                    "value0":400,
+                    "value1":200
+                }
+            ]
+            
+        }
+    
+    ]
+}
+
+The JSON object in javascript will literally do everything except for apply the object title names, to the objects. 
+
+It will even synaxtically display that this is an object {} with the curly braces. 
+
+But it won't save the type name above it. 
+
+Which I need.
+
+So what I just realized is do I really need to mimique pointers in order to reconstruct my application? 
+
+I think the answer is no.
+
+I think I can literally rebuild my application, by literally storing in string, the object type. 
+
+If that is the case, then I can have my objects, inherit a base object class, that retains the objects type 
+information, and that is it.  
+
+So that I don't simply just have to always type in an individual object.type="" variable name.
+
+If I do go down this route, I am without a shadow of a doubt scaling the complexitiy of my project 
+and I have to implement it every object that I have which isn't exactly much. 
+
+The reason it makes sense to do this, is because the application as a hold is much easier to build on
+in the future. 
+
+I am not creating technical debt. I may have to pay the cost up front, but later everything else will be much 
+easier. 
+
+If I choose to simply just create an individual type variable to identify the type of the object. 
+
+It will increase the tech debt, because I will always have to re-write my read and write functionalites.
+
+*NEW UPDATE*
+
+okay now that every object has a member variable, that is assoicated with its type stored within a string.
+
+Okay now, 
+
+I should be able to save the object type into my seralizable classes. 
+
+Now that all of my objects have the object type inside my classes.  
+
+All I need to do, is reconstruct, my .json files to look like 
+
+{
+    "object0":
+    [
+        {
+            "value0":100;
+        }
+    ]
+}
+
+when it comes to serializing your data, even though you added a type 
+hack, there are still more issues. 
+
+your htmlref member variable doesn't get converted to json easily.
+
+This is where you seralizer comes in handy.
+
+something that I know is easy, is that you can access the HTMLref 
+key easily, then input a value.
+
+You might be able to save the information of more complex classes, 
+if you dive deep into each member variable.
+
+Okay I am able to now access the HTMLDivElement's properites for seralization, 
+now the question I need to ask myself, is? 
+
+is it necessary?
+
+
+yeah you need to be able to access the HTMLDIVElement in order to access the textContext
+property inside of it.
+
+
+Developer log 5-06-2025 
+
+Why don't you use all the tools avaliable to finish your application by monday. 
+
+Well I wanted the application to be completely built using javascript. 
+
+I wanted to flex my coding muscles.
+
+Change the scope of your project completely.
+
+Still use what you have in your javascript file, but don't add any further complexity to it. 
+
+For your serializer class simply just get it working to save the information needed to continue the project 
+currently. 
+
+
+All you need is the ID and the text content of the card.
+
+Notes on Serializer 
+
+What do you want the serializer do to?
+
+1. stringify the data that you want
+2. parse the data that you want
+3. what happens if you want to add additional JSON entries into your 
+project?
+
+How does your baseJSON data relate to the obj data you're trying to 
+add in?
+
+How about this, 
+
+you have your botionSerializer that exist and maintains your 
+
+base application JSON 
+
+then you can add several new entries in there respective locations?
+
+There are multiple ways I can solve this? 
+
+Which solution do I choose is the question?
+
+I guess in this case choose the one that works the fastest and 
+doesn't break the most.
+
+Can you implement the seralizing functionality as soon as possible?
+
+How could I create a functionality that will seralize all important 
+information that I know now as well as seralize all important information 
+that I don't know now?
+
+fuck the serializer class, 
+
+can I implement serializer functionality 
+
+What do I need to be able to serialize  
+
+- My flashcards 
+- the information about my cards
+- parts of my application logic 
+
+
+Okay it may seem like you need a class for this, 
+
+but lower the complexity of a class that can do this. 
+
+Is there a way you can serialize as you go?
+
+okay how about this, 
+
+you have the 
+
+class BotionSerializer{
+    constructor()
+    {
+        
+    }
+
+    parse_entry()
+    {
+        //adds an additional JSON entry into your botionJSON file
+    }
+
+    stringify_botionJSON()
+    {
+        //returns to you in string format your botionJSON file
+    }
+}
+
+when serializing in your application choose only the most important logic you need..
+
+don't even worry about the originzation of your JSON file. You can simply just loop through all entires 
+when writing. 
+
+won't this slow everything down?
+
+how long do you think it would take you to write code so that your JSON file is properly organized. 
+
+you can create simply new categories in your botionSerializer and then place them in that category, 
+so things are organized and you only have to check in certain places.
+
+the only thing that you would need to do now, is simply just place another parameter into your 
+parse_entry that will search for the category.
+
+class BotionSerializer{
+    constructor()
+    {
+
+    }
+    createNewCategory()
+    {
+
+    }
+
+    parse_entry()
+    {
+
+    }
+
+    stringify_botionJSON()
+    {
+        
+    }
+}
+
+Why can't you every seem to properly grasp what is asked for you?
+
+Nobody cares about how your code is written, they only care about if it works and if it does what it 
+is suppose to do.
+
+Now you should care to an extent.
+
+But it shouldn't be the main priority. 
+
+The problem is I am always stuck between what they ask me and what I can give.
+
+People don't care about how the code is built or how it works, they only care about if it works. 
+
+You always want to push yourself and increase your skills, and you always want to do it in a way 
+that isn't cheating yourself.
+
+But you're making it something more personal when it doesn't have to be.
+
+why can't you simply just use a combination of things, instead of just javascript. 
+
+Well because YOU want to challenge yourself, they don't really care about how much you challenge yourself.
+
+
+So then again what is really the problem?
+
+WHEN YOU GET ASKED FOR A FEATURE RIGHT? 
+
+HOW COMPLICATED DOES THAT FEATURE NEED TO BE?
+
+THESE PEOPLE JUST WANT THE FUCKING FEATURE
+
+
+the issue that you have is how do you add to json objects together.
+
+
+okay so here is what you can do 
+
+instead of learning to manipulate the strings which would take a boat load of time,
+what you can do is simply 
+
+manipulate the JSON objects themsleves concat them together, because the JSON 
+objects are arrays themselves, and then stringify them.
+
+
+the syntax to doing this is a little weird 
+
+example 
+
+//Creating JSON objects
+    const diffJSON = [{name:"hello", value:"10"}];
+    const diff1JSON = [{name:"baby", value:"100"}];
+//Grabbing original JSON objects 
+    let merged = jsonArray1["BotionData"];
+//place JSON object inside of "BotionData" key
+    merged["BotionData"]={...diffJSON};
+//place JSON object in the index of 1 inside the "BotionData" key
+    merged["BotionData][1]={...diff1JSON};
+//place JSON object inside of "Newcategory" key
+    merged["Newcategory"]={...diff1JSON};
+//place JSON object in the index of 1 inside the "Newcategory" key
+    merged["Newcategory"][1]={...diffJSON}
+
+the only problem, is that you're going to have to iterate in a certain order 
+in order to be able to  properly stringify, to send to local storage.
+
+
+If you know the structure of the array that you're trying to stringify does it matter how it stringify?
+
+you have a decent solution to your probably all it requires is for you to completely transition your JSON into an object and not an array.
+
+
+better way of doing everything 
+
+
+    let merged= JSON.parse(BASEBOTIONJSON);
+    merged.BotionData.NewValue="HELLO";
+    merged.BotionData.NewerValue="THIS";
+    merged.BotionData.EvenNewerValue="IS";
+    merged.BotionData.EvenMoreNewerValue="Better";
+    const ref = merged.BotionData;
+    const stringVersion = JSON.stringify(merged);
+    console.log(merged);      
+    console.log(stringVersion);
+
+    basically you where combining your json into an array, when you could've simply 
+    just kept it as an object.
+
+    traversing this through recursion is not difficult at all.
+
+    I think you need to change your personality in order to be successful in this. 
+
+    I am being super serious. 
+
+
+Okay so I wrote this 
+
+Just do what is asked of you. Pushing yourself without a clear indication on why or where you're trying to get 
+is kind of dumb. Pushing yourself blindly won't get you anywhere that you actually want. 
+
+The most important thing that you can do for yourself is always set the cleariest direction on where you want to go and how you are going to get there. 
+
+Always in whatever you want to do in life. Always make sure that the direction is clear and you know how to get there.
+
+
+These functions will allow you to recursively add entries as well as get values in your JSON folder.
+
+function setRecursive(obj,path,value)
+{
+    if(typeof path == "string") path = path.split(".");
+    if(path.length ===0) return;
+
+    const [key, ...rest] = path;
+
+    if(rest.length === 0)
+    {
+        obj[key] = value;
+    }else{
+        if(!obj[key] || typeof obj[key] !="object")
+        {
+            obj[key] = {};
+        }
+        setRecursive(obj[key],rest,value);
+    }
+}
+
+function getRecursive(obj, path) {
+    if (typeof path === "string") path = path.split(".");
+    if (path.length === 0) return obj;
+  
+    const [key, ...rest] = path;
+  
+    // If the key doesn't exist or obj is not an object, return undefined
+    if (!obj || typeof obj !== "object" || !(key in obj)) {
+      return undefined;
+    }
+  
+    // Recurse down the tree
+    return getRecursive(obj[key], rest);
+  }
+
+  function deleteRecursive(obj, path) {
+  if (typeof path === "string") path = path.split(".");
+  if (path.length === 0 || typeof obj !== "object" || obj === null) return;
+
+  const [key, ...rest] = path;
+
+  if (rest.length === 0) {
+    // Final key: delete it
+    delete obj[key];
+  } else {
+    // Recurse deeper
+    if (obj[key] && typeof obj[key] === "object") {
+      deleteRecursive(obj[key], rest);
+
+      // Optionally, clean up empty objects
+      if (Object.keys(obj[key]).length === 0) {
+        delete obj[key];
+      }
+    }
+  }
+}
+
+
+06-06-2025 Developer log 
+
+Okay after talking with jocylin, minnie and phil about how to approach programming 
+in a more overall improvement approach. I've finally been able to find the fine line 
+between, building things and improving your skillset.
+
+So there is theory, which is what will expand your skills vertically. 
+
+Then there is learning how to finish MVP's, which is what expands your skills horizontally
+as well as making your foundtion stronger.
+
+What this means is, 
+
+that you should always be able to get an mvp out. 
+
+But you can't simply relay on your mvp finishing skills. 
+
+If you don't develop your capabilities for growing your general programming 
+theory, you won't have a skillset.
+
+Okay so I managed to get my JSON Serializer ready, the question is 
+what needs to be serialized now effectively?
+
+- Card's insides the CardManager class
+- Card's css insides the Style Manager class
+
+Honestly that is cool, that is it.
+
+But that means with you're current structure you need to 
+
+implement both 
+
+switch cases of 
+
+"READ" & "WRITE"
+
+In the case of styleManager you need 
+
+What is the order of execution?
+
+the serializer writes inside botionMemory, 
+
+Everything gets serialized inside boitonMemory.
+
+- CardManager.update_Component(message)
+- StyleManager.update_Component(message)
+- BotionMemory.update_Component(message)
+
+
+Should the serializables call to the serializer or should the serializer call 
+the serializables.
+
+
+ BotionMemory.update_Component(message)
+ {
+    CardManager.getInstance()
+    StyleManager.getInstance()
+ }
+
+ are you trying to maintain design pattern for your managers? 
+
+ Is that even necessary anymore?
+
+ Developer log 06-07-2025 
+
+ I think it is a good idea for my classes to be serialized inside of botionMemory 
+ directly.
+
+
+If you still want your code to be functional, you can use helper functions.
+
+
+function iterate_through_cardsfunction()
+{
+    for(let i=0; i< cardsArray.length; i++)
+    {
+        //get
+        cardsArray[i]
+    }
+}
+
+
+Just so you know there is read and write to the .JSON file 
+
+and there is read and write to the application.
+
+I also want to save the styling of each card as well.
+
+if you want your code to follow your event system structure, you're going to have 
+to carry that type of structure throughout your code.
+
+you can simply implement state throughout all your classes that use your mediator class
+
+I would have to refactor almost everything.
+
+and it is because the design patterns that I am using aren't succifient in making the 
+code robust enough.
+
+just simply for now, use the singleton pattern, when you need to combine functionality.
+
+-You're working on trying to see if you can access your stylesheet and it's 
+css rules. 
+
+-also check to see if your 
+
+Alright so this is the structure that you're working with pretty much. 
+
+Inside your html style's div, you have another nodes inside of your styles's div.
+
+
+So it looks like this 
+
+<style> 
+ <text></text>
+ <text></text>
+</style>
+
+that text node stores within it, your styling information.
+
+accessing the sNode.childNodes[n].data will give you, the information you're trying to serialize.
+
+because of the way you're implementing this, simple just put this function in a loop and have it 
+return the important data, that you're interested in. 
+
+
+
+for{
+    retrieve_style(n){   
+    return style.childNodes[n].data;
+    }
+}
+
+okay now it is time for me to set up my READ.
+
+The only thing that you have to do, is setup the cards, and they styles for 
+those cards.
+
+so
+
+there are several ways you can go at this.
+
+but it all boils down to, 
+
+whatever string you read, needs to perform and action, in re-building 
+your application.
+
+so whenever card${id} is seen build a card 
+
+and then because you already have a reference to card at the time 
+
+using the stylemanager append the node as well.
+
+The question is how do I build the loop so that it iterates and catches 
+the string.
+
+You're honstely only looking for a string that says "card${id}"
+
+How am I going to build my application now that I have access to 
+my cards and there member variables.
+
+you have the card and it's id, alright. 
+
+
+Everything in your application is surrounded on the existance of the 
+cards. 
+
+
+you should have functionality in both your cardManager and your StyleManager 
+
+that takes in data of the card that already exist.  
+
+so no create card or create style. 
+
+take card data and create card, and take style data and create style.
+
+
+create card from data? 
+
+what does that look like?
+
+
+remember how you said that there is a read and write to the file as well as a read and write to the application.
+
+Right now you're dealing with a read and write problem to the application.
+
+You're asking if it makes sense for your managers to have write functions to the application?
+
+if that is the case, I really want to implement this type of structure below in my update_component function
+
+update_component(message)
+{
+    switch(message.state)
+    {
+        case: "READ"
+
+        case: "WRITE" 
+
+        case: default
+    }
+}
+
+I'll be able to this if I am able to send pure data, through my event listeners.
+
+You can use JSON, it is literally pure data.
+
+
+Okay so you are going to be using this structure above, but in order for it 
+to work in your BotionappEventData, you're going to have an JSON member variable 
+that contains all the valuable data that you're working with. 
+
+
+You're going to have to convert the data type inside the JSON, back to it's original
+type/object.
+
+You're going to have to re-factor everything.
+
+Um honestly is it necessary?
+
+Okay maybe for another day.
+
+BotionAppEventData
+{
+    this.eventType;
+    this.currentCard;
+    this.state;
+    this.text;
+}
+
+You're running into a design problem.
+
+if you want to use this
+
+update_component(message)
+{
+    switch(message.state)
+    {
+        case: "READ"
+
+        case: "WRITE" 
+
+        case: default
+    }
+}
+
+just have it tied to the card functionality, when you send BotionAppEventData
+
+yeah keep BotionAppEventData as it is, the refactoring, if you want all your 
+
+update_components() to have this structure
+
+switch(message.state)
+{
+
+}
+
+is alot less.
+
+
+// I am going to call this twice though
+CardManager.update_component(message)
+{
+    switch(message.state)
+    {
+        case: "WRITETOAPP":
+        {
+            break;
+        }
+    }
+}
+
+StyleManager.update_component(message)
+{
+    switch(message.state)
+    {
+        case: "WRITETOAPP":
+        {
+            break;
+        }
+    }
+}
+
+the question is, how am I going to continually pass 
+the card data, so that it isn't in the application as well 
+as it gets added the approriate css styling?
+
+You're going to have to ask the switch case to return.
+
+
+you know what you can take a different approach. 
+
+What you can do, is pass whatever data that you need to build. 
+
+Have the data be manipulated inside your case:"WRITETOAPP"
+
+Manipulating this information in JSON would be much better.
+
+do the first option of using return.
+
+
+You don't need to call style.update_component, in order to inject css. 
+
+
+What you can do is  
+
+have cardManager.update_Componet()
+{
+
+    stylemanager.getInstance().updateComponent(message);
+}
+
+Also use the JSON data that you get, to build your cards. that is 
+the whole point of using the JSON data structure.
+
+I've should've created an eventhandler, that adds an eventhandler 
+
+to the cards.
+
+
+there is a new structure to how you're implementing the the 
+event system.
+
+it is going to be 
+
+javascript event listener(event_)
+{
+    let data = new BotionAppEventData(event_,null,"mouseleave")
+
+    your_event_system(data);
+}
+
+
+your_event_system(data_)
+{
+
+    const data= data_;
+}
+
+because the BotionAppEventData is manipulatable, 
+make it a let variable.
+
+you have a couple ways of going at this.
+
+pretty much the isse that you're dealing with 
+
+is when you're creating the cards, you're struggling to 
+create the cards, consistently with your event system. 
+
+you new to reactor your code here.
+
+
+        
+    let newCard = new Card();
+    newCard = cardMang.createCard(newCard);
+
+    DashBoardNode.append(newCard.htmlref);
+
+    //I have to pass the card into this handler
+    newCard.htmlref.addEventListener("click", (event) => {
+        
+        let data = new BotionAppEventData(event, newCard.htmlref, "selected");
+        newCard.eventData = data;
+        cardHasBeenSelected(data);
+    }
+    )
+
+    createCard(card_) {
+        const data = new BotionAppEventData();
+
+        const newCard = new Card()
+        card_ = document.createElement("div");
+        card_.setAttribute("class", "Card Component");
+        card_.setAttribute("id", "card-" + (this.#cardsArray.length + 1)); //ID's will always start at 1.
+        card_.id = this.#cardsArray.length + 1;
+        //assigning all new data to BotionAppEventData.currentCard
+        //also assigning a state called ADDCSS
+        data.currentCar.htmlref = card_;
+        data.state = "ADDCSS";
+
+        //send a Eventdata, sending a message that will inject css into my card.
+        this.#component.send(data, "StyleManager");
+
+        newCard.htmlref = data.currentCard.htmlref;
+
+
+        this.#cardsArray.push(newCard);
+        return newCard;
+    }
+
+    this is the old code. 
+
+    here is what I am thinking about the new code. 
+
+{
+    let data = data_;
+    let newCard = NewCard();
+    data_.currentCard=
+    let newCard = cardMang.createCard(newCard);
+
+}
+
+
+CardManager.createCard(newCard){
+
+
+}
+
+the reason you're coupling event data to your card data, is because in your 
+create card data, you're calling the style manager, and you need to pass state 
+in order for you application to be consistent.
+
+if you have to set state, set it in the event system, not in a manager.
+
+
+event system message, within a event system message? 
+
+Doesn't seem like an bad idea.
+
+
+
+let dashBoardUpdateHandler = function (data_){
+
+
+  const card = data_.data.card_;
+    const event = data_.data.event;
+    const string = data_.data.text;
+    //check to see if all the data is valid up to the card itself.
+    if (data_ != undefined) {
+        if (card != undefined) {
+            if (event != undefined) {
+                card.setState("selected");
+            }
+        }
+        //check to see if the data objects has any text from 
+        //the keyboard listener
+        if (string != undefined) {
+            console.log("Keyboard input:" + data_.data.text);
+            mediator.send(data_.data, "Mediator", "CardManager");
+        }
+    }
+
+}
+
+I want all my application update functionality to work 
+within this function. 
+
+So I have to think about my condtionals here.
+
+basically if I have a card selected, that means, that 
+is the card, that can be edited immediately.
+
+you can simply just check to see if a card has been selected 
+at the top of your dashbaordUpdateHandler. 
+
+you can even see if it is your previous card that has been click, 
+in current card. 
+
+So what you can first do, is see if your previous card 
+is the current card that has been selected, 
+
+
+then check to see if any card has been selected. 
+
+Here is an idea, that I am proposing right now.
+
+
+
+this function 
+
+
+let dashBoardUpdateHandler = function (data_) {
+
+    /*because all information here is mutiable 
+    I am going to keep most things here as a let variable */
+    let card = data_.data.currentCard;
+    let event = data_.data.eventType;
+    let string = data_.data.text;
+
+    /*
+    * if currentCard is the one that has been selected, then give it functionality, 
+    if the currentCard isn't the one that has been selected look for the new selected one, 
+    if it doesn't exist, run the rest of the if statement.
+    */
+    if(card.getState=="selected")
+    {
+        card.htmlref.textContent+=string;   
+    }else if(card.getState=="idle")
+    {
+
+    }else{
+
+    }
+
+
+    //check to see if all the data is valid up to the card itself.
+    if (data_ != undefined) {
+        if (card != undefined) {
+            if (event != undefined) {
+                card.setState("selected");
+            }
+        }
+        //check to see if the data objects has any text from 
+        //the keyboard listene
+
+        console.log("Keyboard input:" + string);
+
+
+
+
+    }
+}
+
+is suppose to be in a class, called 
+
+dashBoard. 
+
+The dashBoard handles the contexts of all the event systems. 
+
+Meaning that the dashboard is actually coupled to the events, 
+
+and can make sense of the events, and actually stores the events 
+
+to create even more functionality. 
+
+I am stressed for time, so here I am.
+
+
+you know what I am noticing. 
+
+Is that whenever you want to abstract your information, to code 
+better you think that you naturally think that you can't 
+apply the functionality of that abstraction without the 
+abstraction. That isn't true at all. 
+
+You can, you're only going to be writing more coupled code.
+
+and the code is probably going to be less intelligeble. 
+
+-I think you should push your main focus to making sure that 
+youre read and write features work. Under all circumstances. 
+
+-I think you should also make sure that you get the keyboard 
+inputs all fixed out. 
+
+-I think you should also think about a decent way of saving 
+in your application. 
+
+Once you get all three of these I want you to implement this.
+
+Developer Log 09-06-2025  
+
+
+Finish keyboard functionality.
+
+
+
+
+{ "isSelected": false, "hasChanged": false, "htmlref":{},"id":1}
+
+
+Developer log 10-07-2025 
+
+After talking to phil how do you want to approach this, honestly?
+
+there is what you're being asked for, and  then there is R&D.
+
+The question is, when do you need to know when to simply just deliver what is being asked of you and for you to go above and beyond.
+
+
+okay you need to restructure your dashBoardUpdateHandler for all the various types of 
+
+update functionality that you're going to be experiencing.
+
+
+so you have let keyboardHandler = function(event_)
+{
+    const character = event_.key;
+    let keyboardChar;
+    let data = new BOtionAppEventData(event_,null,"keypress");
+    data.text = character; 
+
+    if(character !=undefined)
+       switch (data.eventType.key) {
+            //This will be remove in the near future this is simply just 
+            //how I am building this new feature.
+            //Since I am only sending the the keycodes and not changing the data, of the card here 
+            // I might have to make it so that the cards, update themselves.
+            case "Enter":
+                {
+
+                    break;
+                }
+            case "Tab":
+                {
+                    data.text += '\t';
+                    break;
+                }
+            case " ":
+                {
+                    data.text += ' '
+                    break;
+                }
+            //Ignore this input
+            case "Control":
+                {
+                    break;
+                }
+
+            case "s":
+                {
+                    //going to change this.
+                    applicationWriteHandler(data);
+                    break;
+                }
+            case "i":
+                {
+                    //going to change this.
+                    applicationReadHandler(data);
+                    break;
+                }
+            default:
+                {
+                    break;
+                }
+        }
+        update_Application(data);
+}
+
+
+
+let dashBoardUpdateHandler = function (data_) {
+
+    let card = data_.data.currentCard;
+    let event = data_.data.eventType;
+    let string = data_.data.text;
+
+
+    const cardRef = CardManager.getInstance();
+    for (let i = 0; i < cardRef.get_cardsArray.length; i++) {
+        if (cardRef.get_cardsArray[i].getState == "selected") {
+            card = cardRef.get_cardsArray[i];
+        }
+    }
+
+    if (card != undefined) {
+        if (card.getState == "selected") {
+            card.htmlref.textContent += string;
+        
+        } else if (card.getState == "idle") {
+
+        } else {
+
+        }
+    }
+
+}
+
+so dashboardUpdateHandler is going to natrually have alot of freaking code in it.
+
+Before I do that, I want to setup my application read and writes.
+
+
+
+function intialize() {
+
+
+    if(localstorage.getItem("BotionData")==true)
+    {
+        //READ FROM JSON AND WRITE TO APPLICATION
+    }
+
+    mediator.register("BotionMemory", botionMem.get_Component);
+    mediator.register("CardManager", cardMang.get_Component);
+    mediator.register("StyleManager", styleMang.get_Component);
+    mediator.register("Mediator", mediator.get_component);
+
+    botionSerial.set_botionJSON = BASEBOTIONJSON;
+
+    document.head.appendChild(styleMang.get_Style);
+
+}
+
+The question that I have is when you do want to save, your information? 
+
+I think honestly when you press CTRL+S. 
+
+you should also give a sign that your application has saved. 
+
+^^^^^^
+
+the above feature can be done as simply as you want to.
+
+You should make it so that the read and the writes work 
+
+
+I am going to have to re-write this code over here.
+
+
+    
+do I need a set text function?
+
+you can have each card check if it hasn't been selected, from the 
+last previous step.
+
+or I can send the current card that has been selected a message to the previous card that has been selected.
+
+
+
+Quick botionTeacher functionality? 
+
+What do you want the botionTeacher to have?
+
+The botion teacher should have access to the answer that I want 
+to test myself on. 
+
+These answers will simply just be written answers. to get them correct
+you only need to match the same characters. 
+
+make the order of the answers randomized 
+
+the botionteacher will then update you on the series of answers you've 
+have gotten correct. 
+
+class BotionTeacher
+{
+    
+    setAnswers(answers_)
+    {
+        answers=answers_
+    }
+
+    testStudent()
+    {
+        /*go through questioning the student 
+        and checking to see if they give you the right answers.
+        
+        probably have to check which question you're at*/
+    }
+
+    answers=[];
+}
+
+
+Developer log 12-07-2025 
+
+I need my card animation to have events, in order to be able to 
+know when the card has flipped. 
+
+
+Okay so I have the card flipping animation, now what I need to do, 
+is add that css animation to each card modularly. 
+
+the card flipping works by  
+
+- simply just adding and removing the css animation selectors.
+
+
+- you're always going to have a 
+
+.animate1{
+    animation: 4s steps(400) 1 forwards "animation name";
+}
+
+
+@keyframe "animation name"{
+    /*animation code */
+}
+
+
+you inject thing into your approriate divs 
+
+.animate1{
+    animation: 4s steps(400) 1 forwards "animation name";
+}
+
+
+this you can either inject or leave in your css as a 
+css definition.
+
+@keyframe "animation name"{
+    /*animation code */
+}
+
+you have to inject both the front flip and the side flip.
+
+you might not even have to inject css into all the cards, you might only need to simply 
+just put an event listener, that call the cards to flip when clicked.
+
+
+In order for dispatch event you need access to the element that has the listener.

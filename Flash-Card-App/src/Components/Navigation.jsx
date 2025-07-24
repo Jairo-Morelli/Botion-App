@@ -7,7 +7,7 @@ function Navigation({ props }) {
             <div className=" border-b border-white w-full">
                 <nav id="menu" className="navbar navbar-default navbar-fixed-top ">
                     <div className="flex justify-center items-center ">
-                    <img className="inline-block"src="./../../public/library_Icon.svg" />
+                    <img className="inline-block"src="/assets/library_Icon.svg" />
                         <div className="navbar-header inline-block w-[300px]">
                             <h2 className="text-4xl text-white font-[Montserrat] uppercase p-[5px] mr-[600px]">botion</h2>
                         </div>

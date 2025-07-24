@@ -1,0 +1,13 @@
+### ping
+
+http://localhost:8888/ping
+
+### protected
+
+http://localhost:8888/protected
+Content-Type: application/json
+Authorization: Jairo
+
+### teacher ask
+
+http://localhost:8888/teacher-ask

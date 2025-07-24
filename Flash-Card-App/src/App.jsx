@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
 import PlainApp from "./plainApp";
 import HeroSection from "./Components/HeroSection";
@@ -41,7 +39,7 @@ function App() {
         <Navigation />
       </div>
       <div className={styles.imageContainer}>
-        <img src="../public/library.jpg"/>
+        <img src="/assets/library.jpg"/>
           {/* <HeroSection /> */}
       </div>
       <div className={styles.featureContainer}>

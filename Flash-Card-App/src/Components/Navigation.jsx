@@ -1,7 +1,7 @@
 import React from "react";
 
 
-function Navigation({ props }) {
+function Navigation() {
     return (
         <>
             <div className=" border-b border-white w-full">

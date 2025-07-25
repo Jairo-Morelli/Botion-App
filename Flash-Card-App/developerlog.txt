@@ -879,3 +879,14 @@ compliance that make it slower and heavier.
 In contrast, REST is a set of guidelines that can be implemented as needed, making 
 REST APIs faster and more lightweight, with increased scalability- perfect for Internt 
 of Things(IoT) and mobile app development.
+
+Personal Note 
+
+Route the try Botion application button, 
+
+Personal Note 
+
+When building UIs, remember that pay attention to the 
+left over space when you're building your UIs. That is 
+how you make the most use of your UIs. By understanding 
+what space is left over, and how to fill it.

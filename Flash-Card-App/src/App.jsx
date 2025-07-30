@@ -16,6 +16,7 @@ import Navigation from "./Components/Navigation";
 import Book_Catalogue from "./Components/Book_Catalogue";
 import About from "./Components/About";
 import ContactPage from "./Pages/Contact";
+import Clients from "./Components/Clients";
 function App() {
   const [count, setCount] = useState(0);
   const [featureCardData, setFeatureCardData] = useState({});
@@ -54,6 +55,9 @@ function App() {
       </div>
       <div>
         <About/>
+      </div>
+      <div>
+        <Clients/>
       </div>
       <div>
         <Get_In_Touch/>

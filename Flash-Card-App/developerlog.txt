@@ -894,9 +894,19 @@ what space is left over, and how to fill it.
 Developer notes 30-07-2025 
 
 To Do 
-1. Rename Features to BookCatelog 
-2. Create a About React Function Component 
-3. Finish the About React Function Component
+1. Rename Features to BookCatelog (done)
+2. Finish the About React Function Component(done)
 
 Personal note you want to add, The Slide feature as 
 well from the template that you're using.
+
+To Do 
+1. Implement the What Our Clients Say section
+2. Implement some sort of image api so the profile 
+images change randomly, also have dummy names that 
+randomly change. This will require an API, you could 
+build that API yourself. 
+3. After that simply build your get in touch, and that 
+is all the website that you need to build. After that you're 
+going to be polishing the thing. 
+ 3a. Have the API have small and big pictures as well.

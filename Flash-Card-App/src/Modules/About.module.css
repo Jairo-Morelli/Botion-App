@@ -6,6 +6,7 @@
 .AboutContainer{
     display: flex;
     flex-direction: row;
+    align-items: start;
 }
 
 .AboutParagraph

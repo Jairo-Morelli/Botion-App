@@ -890,3 +890,13 @@ When building UIs, remember that pay attention to the
 left over space when you're building your UIs. That is 
 how you make the most use of your UIs. By understanding 
 what space is left over, and how to fill it.
+
+Developer notes 30-07-2025 
+
+To Do 
+1. Rename Features to BookCatelog 
+2. Create a About React Function Component 
+3. Finish the About React Function Component
+
+Personal note you want to add, The Slide feature as 
+well from the template that you're using.

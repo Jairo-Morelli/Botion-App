@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import "./App.css";
-import PlainApp from "./plainApp";
-import HeroSection from "./Components/HeroSection";
-import Navigation from "./Components/Navigation";
-import Features from "./Components/Features";
-import About from "./Components/About";
-import ContactPage from "./Pages/Contact";
-import AboutPage from "./Pages/About";
+/*CSS*/
 import styles from "./Modules/HeroSection.module.css";
+import "./App.css";
+/*The original capstone, this needs a better name */
+import PlainApp from "./plainApp";
+/*APIs*/
 import self_development_books from "./data/self_development_books.json";
 import septhen_king_books from "./data/stephen_king_books.json";
+/*Components */
 import Get_In_Touch from "./Components/Get_In_Touch";
+import Features from "./Components/Features";
+import HeroSection from "./Components/HeroSection";
+import Navigation from "./Components/Navigation";
+import Book_Catalogue from "./Components/Book_Catalogue";
+import About from "./Components/About";
+import ContactPage from "./Pages/Contact";
 function App() {
   const [count, setCount] = useState(0);
   const [featureCardData, setFeatureCardData] = useState({});
@@ -33,7 +37,7 @@ function App() {
       <div className={styles.maincontainer}>
         <Routes>
           <Route path="/Home" element={<App />} />
-          <Route path="/About" element={<AboutPage />}></Route>
+          <Route path="/About" element={<About />}></Route>
           <Route path="/Contact" element={<ContactPage />} />
           <Route path="/plainApp" element={<PlainApp />} />
         </Routes>
@@ -43,7 +47,10 @@ function App() {
          <HeroSection /> 
       </div>
       <div className={styles.featureContainer}>
-        <Features props={featureCardData} />
+        <Book_Catalogue props={featureCardData} />
+      </div>
+      <div>
+         <Features/> 
       </div>
       <div>
         <About/>

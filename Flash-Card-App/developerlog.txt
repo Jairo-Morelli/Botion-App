@@ -909,4 +909,144 @@ build that API yourself.
 3. After that simply build your get in touch, and that 
 is all the website that you need to build. After that you're 
 going to be polishing the thing. 
- 3a. Have the API have small and big pictures as well.
+ 3a. Have the API have small and big pictures as well. 
+
+ Developer Notes 
+
+ The <form> HTML element represents a document section containing interactive controls for 
+ submitting infromation.
+
+ The <input> HTML element is used to create interactive controls for web-based forms in order to 
+ accept data from the user' a wide variety of types of input data and controls widgets are avaliable, depending
+ on the device and user agent. 
+
+ The <textarea> HTML element represents a mutli-line plain-text editing control, useful when you want to allow users
+ to enter a sizeable amount of free-form text, for example a comment on a review or feedback form.
+
+ Notes from claude talking about the template you're imitating 
+
+ Specfici Techniques in This Design: 
+ Layout structure: 
+ - Two-column layout (form on left, contact info on right)
+ - Centred container with proper spacing 
+ - Responsive breakpoints for mobile 
+
+ Visual Elements: 
+ - Graident background (likely linear-gradient() in CSS)
+ - Rounded input fields and butttons 
+ - Consistent spacing and alignment 
+ - Icon integration (for address, phone, email icons)
+ - Social media buttons with hover effects 
+
+ - learn to make the gradiants better looking
+
+ Developer Notes 
+
+ Separate the thinking from the doing: 
+
+ - Have pure "design/planning" sessions where you make all the decisions upfront
+ - Then have "implentation" sessions where you execute what you already decided
+ - Keep "debugging" as its own dedicated activity 
+
+ Batch similar mental activites: 
+
+ - Do all your research/learning in one block 
+ - Make all architectural decisions in another block 
+ - Save all the "midless" coding (like styling, boilerplat) for when you're mentally thickBorder
+
+ Separate problem identification from problem solving: 
+ - First session: just identify and write down what's broken
+ - Later session: actually fix those things
+
+ This way, instead of constantly switching between "waht should I do?" 
+ and "How do I do it?" and "why isn't this working?" - you tackle each 
+ type of thinking separartely when your brain is in the right 
+ mode for it.
+
+ 1. Scope out your entire engineering process 
+  - Decide upfront which of the 8 processes this feature 
+  actually needs 
+  - Right size the process intensity to match the feature 
+  complexity. 
+  2. Focus on one feature at a time 
+   - Clear, bounded scope that you can conceptualize completely
+   - no mental juggling of multiple features 
+  3. Set up your focused environment 
+   - Only the tools you need for this feature
+   - Only the medium to see your work (console, preview, etc.)
+   - Remove distractions and other project files 
+  4. Use all your energy on that single feature 
+    - Deep focus without context switching 
+    - Complete the feauter before moving to the next 
+  5. Build the app peice by piece
+    - Each feature is complete, meaningful unit of Progress
+    - Systematic progress through the entire application. 
+
+  There reason this process works is because it is recursive. 
+
+  This is how you optimize your 5-step approach: 
+
+  Optimize your process scoping (Step 1): 
+  - Get etter at quickly identifying which processes each feature actually
+  needs
+  - Build templates/checklists for common feature types to speed up scoping decisions
+  - Learn to recognize patterns so you can scope faster 
+
+  Improve your feature identification (Step 2): 
+  - Get better at breaking features down to optimal size on the first try 
+  - Develop intuition for what 'right-sized" feels like for you 
+  - Build a library of feature patterns you can reuse 
+
+  Streamline your environment setup (Step 3):
+   - Create standard setups you can quickly replicate
+   - Use better tooling that reduces friction 
+   - Automate repetitive environment configuration 
+
+  Increase your focused work capacity (Step 4): 
+  - Build up your sustained focus endurance over time
+  - Optimize your physical environment (lighting, ergonomics, etc.)
+  - Find your peak energy times and protect them for complex features 
+
+  Speed up the piece-by-piece progression (Step 5): 
+  - Get faster at the actual implementation through practice 
+  - Build reusable copmonents/patterns 
+  - Improve your technical skills to reduce implementation time 
+
+  Some ways you might test your engineering process: 
+
+   - Track what parts of the 5 steps consistently take longer than expected 
+   - Notice which types of features break your process assumptions 
+   - Identify weher you'r estill getting mentally fatigued despite following the frame work 
+   - See which process variations work better for different features types.
+
+
+   Developer Notes 31-07-2025 21:10  
+
+   Okay so I am choosing to improve the very workflow, that I have by basically 
+   being extremely intentional.
+
+   Problem #1 to test my theory  
+
+   I have three input boxes, each that I do not know how to increase in size. 
+   They all need to be a certain size and all need to have some sort of coloured 
+   background. 
+
+  The problem now is that I have to learn how to do something. But context switching generally
+  will be a pain. 
+
+  So essentially I have to learn TWO things. Two new things. I also have to 
+  stylize a button as well. The inpt and the button have different types of styles. 
+
+  Okay so here is the thing you're bring is actually good at maintaining LARGE CONTEXTs. 
+
+  THE MAIN PROBLEM WHEN IT COMES TO THE MENTAL ENERGY PROBLEMS IS THE CONTEXT CHANGING. 
+  DON'T CONTEXT CHANGE, STAY AWAY FROM CONTEXT CHANGING AT ALL COST. 
+
+  THE HACK IS YOUR BRAIN IS ACTUALLY VERY, AND I MEAN VERY GOOD AT MAINTAINING A SINGULAR 
+  LARGE CONTEXT.
+
+  THE PROBLEM IS YOURING TRYING TO KEEP IN YOUR MIND A SPECIFIC CONTEXT, BUT BECAUSE OF 
+  THE NATURE WHAT YOU DO, YOU HAVE TO MOVE AWAY FROM THAT CONTEXT. SO YOU'RE FORCING 
+  YOURSELF TO REMEMBER IT. 
+
+  THE PROBLEM IS TRYING TO KEEP THE CONTEXT IN YOUR HEAD.

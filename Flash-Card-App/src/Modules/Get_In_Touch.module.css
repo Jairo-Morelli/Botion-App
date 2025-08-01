@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+.background{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: linear-gradient(to right, white 10%,#5b3125 120%);
+    width: 100%;
+    height: 100%;
+}

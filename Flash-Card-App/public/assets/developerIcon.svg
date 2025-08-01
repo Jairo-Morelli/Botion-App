@@ -1,0 +1,23 @@
+<svg width="250" height="250" viewBox="0 0 250 250" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background square -->
+  <rect x="25" y="25" width="200" height="200" rx="15" ry="15" fill="#325b25" stroke="#E5E7EB" stroke-width="3"/>
+  
+  <!-- Person icon -->
+  <g fill="#FFFFFF">
+    <!-- Head -->
+    <circle cx="125" cy="100" r="25"/>
+    
+    <!-- Body/shoulders -->
+    <path d="M 85 160 Q 85 140 105 140 L 145 140 Q 165 140 165 160 L 165 180 Q 165 190 155 190 L 95 190 Q 85 190 85 180 Z"/>
+  </g>
+  
+  <!-- Optional: Add a subtle shadow effect -->
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  
+  <!-- Apply shadow to the square -->
+  <rect x="25" y="25" width="200" height="200" rx="15" ry="15" fill="none" stroke="none" filter="url(#shadow)" opacity="0.3"/>
+</svg>

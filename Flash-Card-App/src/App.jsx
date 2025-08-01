@@ -17,6 +17,9 @@ import Book_Catalogue from "./Components/Book_Catalogue";
 import About from "./Components/About";
 import ContactPage from "./Pages/Contact";
 import Clients from "./Components/Clients";
+import Team from "./Components/Team";
+
+
 function App() {
   const [count, setCount] = useState(0);
   const [featureCardData, setFeatureCardData] = useState({});
@@ -60,8 +63,14 @@ function App() {
         <Clients/>
       </div>
       <div>
+        <Team/>
+      </div>
+      <div>
         <Get_In_Touch/>
       </div>
+      <footer>
+        <h1 className="text-9xl text-white"> THIS IS THE FOOTER</h1>
+      </footer>
     </>
 
   )
